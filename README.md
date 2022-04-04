@@ -9,6 +9,11 @@ Basically an exact copy of the (amazing) [YouTube tutorial by Zigurous](https://
 ## Goals
 
 - ~~Complete Tutorial~~
+- ~~Dynamic Border~~
 - Add proper new peice queue (A bag containing each piece randomly chosen until every piece chosen, then create new bag). "Real" Tetris shouldn't be full random Piece selection.
 - Score/Reward
 - Scaling Speed on line(s) cleared.
+
+## Known Bugs
+
+- Ghost piece shouldn't search from bottom up, it should start from top and search down.
