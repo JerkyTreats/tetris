@@ -18,3 +18,4 @@ Basically an exact copy of the (amazing) [YouTube tutorial](https://www.youtube.
 ## Known Bugs
 
 - ~~Ghost piece shouldn't search from bottom up, it should start from top and search down.~~
+  - If the `I` piece is the first to spawn, its Ghost will be placed in an incorrect position.
