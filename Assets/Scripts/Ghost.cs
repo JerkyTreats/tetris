@@ -38,21 +38,22 @@ public class Ghost : MonoBehaviour
 
     private void Drop() {
         RectInt bounds = this.board.Bounds;
-        int row = bounds.yMin;
+        int row = this.trackingPiece.position.y - 1;
 
         // Wrap logic in Clear/Set as IsValidPosition will be false
         // As Ghost will be in same position as tracking piece
         this.board.Clear(this.trackingPiece);
 
-        while ( row < bounds.yMax ) {
+        while ( row >= bounds.yMin - 1 ) {
             Vector3Int pos = this.trackingPiece.position;
-            pos.y = row - 1;
+            pos.y = row;
 
             if(this.board.IsValidPosition(this.trackingPiece, pos)) {
+                row--;
+            } else {
+                pos.y = row + 1;
                 this.position = pos;
                 break;
-            } else {
-                row++;
             }
         }
 

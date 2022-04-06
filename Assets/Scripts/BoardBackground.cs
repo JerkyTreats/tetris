@@ -21,7 +21,6 @@ public class BoardBackground : MonoBehaviour
         for (int row = bounds.yMin; row < bounds.yMax; row++) {
             for (int col = bounds.xMin; col < bounds.xMax; col++) {
                 Vector3Int pos = new Vector3Int(col, row, 0);
-                Debug.Log(pos);
                 this.tileMap.SetTile(pos, this.gridTile);
             }
         }
