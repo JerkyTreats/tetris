@@ -12,6 +12,7 @@ Basically an exact copy of the (amazing) [YouTube tutorial](https://www.youtube.
 - ~~Dynamic Border~~
 - ~~Dynamic Background Grid~~
 - ~~Add proper new peice queue (A bag containing each piece randomly chosen until every piece chosen, then create new bag). "Real" Tetris shouldn't be full random Piece selection.~~
+- ~~Dynamic Camera~~
 - Score/Reward
 - Scaling Speed on line(s) cleared.
 
@@ -19,3 +20,4 @@ Basically an exact copy of the (amazing) [YouTube tutorial](https://www.youtube.
 
 - ~~Ghost piece shouldn't search from bottom up, it should start from top and search down.~~
   - If the `I` piece is the first to spawn, its Ghost will be placed in an incorrect position.
+  - The ghost for `I` in general seems a bit messed up. I think its because its the only piece that is one size high.
