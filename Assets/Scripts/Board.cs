@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
+using System.Collections.Generic;
 public class Board : MonoBehaviour
 {
     public TetrominoData[] tetrominos;
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
     public Vector3Int spawnPosition;
+    public List<Tetromino> spawnBag;
     public Vector2Int boardSize = new Vector2Int(10,20);
 
     public RectInt Bounds {
@@ -28,11 +29,17 @@ public class Board : MonoBehaviour
         SpawnPiece();
     }
 
+    /// <summary>
+    /// Spawn a new tetromino. Trigger Game Over state if applicable.
+    /// </summary>
     public void SpawnPiece() {
-        int rnd = Random.Range(0, this.tetrominos.Length);
-        TetrominoData data = this.tetrominos[rnd];
+        Tetromino nextPiece = GetNextPeice();
 
-        this.activePiece.Initialize(spawnPosition, data, this);
+        for (int i = 0; i < this.tetrominos.Length; i++){
+            if (this.tetrominos[i].tetromino == nextPiece) {
+                this.activePiece.Initialize(spawnPosition, this.tetrominos[i], this);
+            }
+        }
 
         if (IsValidPosition(this.activePiece, this.spawnPosition)) {
             Set(this.activePiece);
@@ -40,6 +47,31 @@ public class Board : MonoBehaviour
             GameOver();
         }
     }
+
+    /// <summary>
+    /// Randomly cycle through a bag of each type of Tetromino. Refill bag on empty.
+    /// </summary>
+    /// <returns>Tetromino Enum to spawn next</returns>
+    private Tetromino GetNextPeice() {
+        if (this.spawnBag.Count == 0){
+            spawnBag = new List<Tetromino> {
+                Tetromino.I,
+                Tetromino.O,
+                Tetromino.T,
+                Tetromino.J,
+                Tetromino.L,
+                Tetromino.S,
+                Tetromino.Z,
+            };
+        }
+
+        int rnd = Random.Range(0, this.spawnBag.Count);
+        Tetromino nextPiece = spawnBag[rnd];
+        spawnBag.RemoveAt(rnd);
+        return nextPiece;
+    }
+
+
 
     private void GameOver() {
         this.tilemap.ClearAllTiles();
