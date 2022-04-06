@@ -7,9 +7,9 @@ public class Board : MonoBehaviour
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
     public Vector3Int spawnPosition;
-    public List<Tetromino> spawnBag;
+    public List<Tetromino> spawnBag = new List<Tetromino>();
     public Vector2Int boardSize = new Vector2Int(10,20);
-
+    public GameObject boardCamera { get; private set; }
     public RectInt Bounds {
         get {
             Vector2Int position = new Vector2Int(-this.boardSize.x / 2, -this.boardSize.y / 2);
@@ -23,9 +23,30 @@ public class Board : MonoBehaviour
         for (int i = 0;  i < tetrominos.Length; i++) {
             this.tetrominos[i].Initialize();
         }
+
+        InitializeCamera();
+    }
+
+    private void InitializeCamera() {
+        this.boardCamera = new GameObject("camera");
+        this.boardCamera.transform.position = new Vector3(0, 0, -10.0f);
+        this.boardCamera.SetActive(false);
+
+        this.boardCamera.AddComponent<Camera>();
+        this.boardCamera.transform.parent = this.transform;
+
+        Camera camera = this.boardCamera.GetComponentInChildren<Camera>();
+        camera.orthographic = true;
+        camera.orthographicSize = 12.00f;
+    }
+
+    private void ActivateCamera() {
+        this.boardCamera.tag = "MainCamera"; // sets Camera.main property
+        this.boardCamera.SetActive(true);
     }
 
     private void Start() {
+        ActivateCamera();
         SpawnPiece();
     }
 
