@@ -16,6 +16,9 @@ public class Board : MonoBehaviour
             return new RectInt(position, boardSize);
         }
     }
+    public BoardData boardData { get; private set; }
+    private string _saveFile;
+
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
         this.activePiece = GetComponentInChildren<Piece>();
@@ -27,6 +30,15 @@ public class Board : MonoBehaviour
         InitializeCamera();
     }
 
+    private void Start() {
+        ActivateCamera();
+        SpawnPiece();
+    }
+
+    /// <summary>
+    /// Creates a camera object to focus on this board.
+    /// TODO : Make the transform position a variable that can be saved.
+    /// </summary>
     private void InitializeCamera() {
         this.boardCamera = new GameObject("camera");
         this.boardCamera.transform.position = new Vector3(0, 0, -10.0f);
@@ -40,14 +52,12 @@ public class Board : MonoBehaviour
         camera.orthographicSize = 12.00f;
     }
 
+    /// <summary>
+    /// Makes this camera the one the user will be viewing.
+    /// </summary>
     private void ActivateCamera() {
         this.boardCamera.tag = "MainCamera"; // sets Camera.main property
         this.boardCamera.SetActive(true);
-    }
-
-    private void Start() {
-        ActivateCamera();
-        SpawnPiece();
     }
 
     /// <summary>
