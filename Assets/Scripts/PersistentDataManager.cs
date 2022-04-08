@@ -1,6 +1,7 @@
 using ProtoBuf;
 using System.IO;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PersistentDataManager {
@@ -9,11 +10,13 @@ public class PersistentDataManager {
     private string saveFile;
     private string saveFileName;
 
+    private string saveDir = Application.persistentDataPath;
+
     public PersistentDataManager() {
-        this.saveFile = Path.Combine(Application.persistentDataPath, GetSaveFileName());
+        this.saveFile = Path.Combine(saveDir, GetNewSaveFileName());
     }
 
-    public string GetSaveFileName() {
+    public string GetNewSaveFileName() {
         // 1
         int highestSaveNum = GetHighestSaveFileNum();
 
@@ -36,6 +39,8 @@ public class PersistentDataManager {
             string[] saveNameArr = fileName.Split(new string[] { SAVE_FILE_NAME }, StringSplitOptions.None);
             // [001, .dat]
             string[] saveFileNumArr = saveNameArr[1].Split(new string[] { SAVE_FILE_TYPE }, StringSplitOptions.None);
+
+            // 1
             int saveFileNum = Int32.Parse(saveFileNumArr[1]); // to int
 
             if (saveFileNum > highestSaveNum )
@@ -57,7 +62,18 @@ public class PersistentDataManager {
 
 
 
-    private void SaveGame() {
+    private void SaveBoard(Board board) {
+        string fileName = GetNewSaveFileName();
 
+        using var file = File.OpenWrite(fileName);
+
+        var data = new BoardData
+        {
+            spawnPosition = board.spawnPosition,
+            boardSize = board.boardSize,
+            tiles = board.placedBlocks
+        };
+
+        Serializer.Serialize(file, data);
     }
 }
