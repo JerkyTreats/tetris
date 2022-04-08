@@ -71,7 +71,7 @@ public class PersistentDataManager {
         {
             spawnPosition = board.spawnPosition,
             boardSize = board.boardSize,
-            tiles = board.placedBlocks
+            // tiles = board.placedBlocks
         };
 
         Serializer.Serialize(file, data);
