@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
-public class Ghost : MonoBehaviour
-{
-    public Tile tile;
-    public Board board;
-    public Piece trackingPiece;
 
+/// <summary>
+/// Tracks the Active Piece and shows the position that piece would be if it were dropped.
+/// </summary>
+public class GhostPiece : MonoBehaviour
+{
+    public Board board;
+    public Tile tile;
+    public ActivePiece trackingPiece { get; private set; }
     public Tilemap tilemap { get; private set; }
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
@@ -13,6 +16,12 @@ public class Ghost : MonoBehaviour
     public void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
         this.cells = new Vector3Int[4];
+    }
+
+    public void Initialize() {
+        this.board = gameObject.GetComponentInParent<Board>();
+        this.trackingPiece = board.activePiece;
+        this.tile = board.ghost;
     }
 
     // Do late update to track when the real piece moves
@@ -23,6 +32,9 @@ public class Ghost : MonoBehaviour
         Set();
     }
 
+    /// <summary>
+    /// Remove the ghost from the board
+    /// </summary>
     private void Clear() {
         for (int i = 0; i < this.cells.Length; i++) {
             Vector3Int tilePosition = this.cells[i] + this.position;
@@ -30,12 +42,18 @@ public class Ghost : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clone the tracking piece shape as the ghosts shape
+    /// </summary>
     private void Copy() {
         for (int i = 0; i < this.cells.Length; i++) {
             this.cells[i] = this.trackingPiece.cells[i];
         }
     }
 
+    /// <summary>
+    /// Drops the piece to the correct row
+    /// </summary>
     private void Drop() {
         RectInt bounds = this.board.Bounds;
         int row = this.trackingPiece.position.y - 1;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Piece : MonoBehaviour
+public class ActivePiece : MonoBehaviour
 {
     public Board board { get; private set; }
     public TetrominoData data { get; private set; }

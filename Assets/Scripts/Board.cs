@@ -4,24 +4,23 @@ using System.Collections.Generic;
 public class Board : MonoBehaviour
 {
     public TetrominoData[] tetrominos;
+    public Tile ghost;
     public Tilemap tilemap { get; private set; }
-    public Piece activePiece { get; private set; }
+    public ActivePiece activePiece { get; private set; }
     public Vector3Int spawnPosition;
     public List<Tetromino> spawnBag = new List<Tetromino>();
     public Vector2Int boardSize = new Vector2Int(10,20);
     public GameObject boardCamera { get; private set; }
+
     public RectInt Bounds {
         get {
             Vector2Int position = new Vector2Int(-this.boardSize.x / 2, -this.boardSize.y / 2);
             return new RectInt(position, boardSize);
         }
     }
-    public BoardData boardData { get; private set; }
-    private string _saveFile;
 
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
-        this.activePiece = GetComponentInChildren<Piece>();
 
         for (int i = 0;  i < tetrominos.Length; i++) {
             this.tetrominos[i].Initialize();
@@ -30,9 +29,18 @@ public class Board : MonoBehaviour
         InitializeCamera();
     }
 
-    private void Start() {
+    void Start() {
+        ActivateGameOnBoard();
+    }
+
+    /// <summary>
+    /// Make this board the active one with the game playing.
+    /// </summary>
+    private void ActivateGameOnBoard() {
+        this.activePiece = this.gameObject.AddComponent<ActivePiece>();
         ActivateCamera();
         SpawnPiece();
+        InitializeGhost();
     }
 
     /// <summary>
@@ -102,19 +110,30 @@ public class Board : MonoBehaviour
         return nextPiece;
     }
 
+    /// <summary>
+    /// Create the Ghost Piece gameobject and initialize
+    /// </summary>
+    private void InitializeGhost() {
+        GameObject ghostObject = new GameObject("Ghost");
+        ghostObject.transform.parent = this.transform;
+        ghostObject.AddComponent<Tilemap>();
+        ghostObject.AddComponent<TilemapRenderer>();
+        GhostPiece ghostPiece = ghostObject.AddComponent<GhostPiece>();
+        ghostPiece.Initialize();
 
+    }
 
     private void GameOver() {
         this.tilemap.ClearAllTiles();
 
-        //...
+        // TODO : Something useful with this
     }
 
     /// <summary>
     /// Set piece on board
     /// </summary>
     /// <param name="piece"></param>
-    public void Set(Piece piece) {
+    public void Set(ActivePiece piece) {
         for (int i = 0; i < piece.cells.Length; i++) {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             this.tilemap.SetTile(tilePosition, piece.data.tile);
@@ -125,7 +144,7 @@ public class Board : MonoBehaviour
     /// Remove peice from board
     /// </summary>
     /// <param name="piece"></param>
-    public void Clear(Piece piece) {
+    public void Clear(ActivePiece piece) {
         for (int i = 0; i < piece.cells.Length; i++) {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             this.tilemap.SetTile(tilePosition, null);
@@ -138,7 +157,7 @@ public class Board : MonoBehaviour
     /// <param name="piece"></param>
     /// <param name="newPosition"></param>
     /// <returns>bool</returns>
-    public bool IsValidPosition(Piece piece, Vector3Int newPosition) {
+    public bool IsValidPosition(ActivePiece piece, Vector3Int newPosition) {
         RectInt bounds = this.Bounds;
 
         for (int i = 0; i < piece.cells.Length; i++ ) {
@@ -217,5 +236,4 @@ public class Board : MonoBehaviour
             row++;
         }
     }
-
 }
