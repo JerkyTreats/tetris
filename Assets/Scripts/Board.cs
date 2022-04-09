@@ -10,7 +10,7 @@ public class Board : MonoBehaviour
     public Vector3Int spawnPosition;
     public List<Tetromino> spawnBag = new List<Tetromino>();
     public Vector2Int boardSize = new Vector2Int(10,20);
-    public GameObject boardCamera { get; private set; }
+    public BoardCamera boardCamera { get; private set; }
 
     public RectInt Bounds {
         get {
@@ -26,7 +26,7 @@ public class Board : MonoBehaviour
             this.tetrominos[i].Initialize();
         }
 
-        InitializeCamera();
+        boardCamera = new BoardCamera(this.gameObject);
     }
 
     void Start() {
@@ -38,35 +38,11 @@ public class Board : MonoBehaviour
     /// </summary>
     private void ActivateGameOnBoard() {
         this.activePiece = this.gameObject.AddComponent<ActivePiece>();
-        ActivateCamera();
+        boardCamera.ActivateCamera();
         SpawnPiece();
         InitializeGhost();
     }
 
-    /// <summary>
-    /// Creates a camera object to focus on this board.
-    /// TODO : Make the transform position a variable that can be saved.
-    /// </summary>
-    private void InitializeCamera() {
-        this.boardCamera = new GameObject("camera");
-        this.boardCamera.transform.position = new Vector3(0, 0, -10.0f);
-        this.boardCamera.SetActive(false);
-
-        this.boardCamera.AddComponent<Camera>();
-        this.boardCamera.transform.parent = this.transform;
-
-        Camera camera = this.boardCamera.GetComponentInChildren<Camera>();
-        camera.orthographic = true;
-        camera.orthographicSize = 12.00f;
-    }
-
-    /// <summary>
-    /// Makes this camera the one the user will be viewing.
-    /// </summary>
-    private void ActivateCamera() {
-        this.boardCamera.tag = "MainCamera"; // sets Camera.main property
-        this.boardCamera.SetActive(true);
-    }
 
     /// <summary>
     /// Spawn a new tetromino. Trigger Game Over state if applicable.
