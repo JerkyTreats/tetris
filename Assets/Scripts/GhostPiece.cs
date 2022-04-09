@@ -13,6 +13,8 @@ public class GhostPiece : MonoBehaviour
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
 
+    private bool IsInitialized = false;
+
     /// <summary>
     /// Create the Ghost Piece gameobject and initialize
     /// </summary>
@@ -34,14 +36,17 @@ public class GhostPiece : MonoBehaviour
         this.board = gameObject.GetComponentInParent<Board>();
         this.trackingPiece = board.activePiece;
         this.tile = board.ghost;
+        this.IsInitialized = true;
     }
 
     // Do late update to track when the real piece moves
     private void LateUpdate() {
-        Clear();
-        Copy();
-        Drop();
-        Set();
+        if (this.IsInitialized){
+            Clear();
+            Copy();
+            Drop();
+            Set();
+        }
     }
 
     /// <summary>
