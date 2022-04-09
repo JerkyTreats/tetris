@@ -22,10 +22,12 @@ public class Board : MonoBehaviour
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
 
+        // Initialize each Tetromino listed in Editor object
         for (int i = 0;  i < tetrominos.Length; i++) {
             this.tetrominos[i].Initialize();
         }
 
+        // Initialize unactivated camera;
         boardCamera = new BoardCamera(this.gameObject);
     }
 
@@ -40,7 +42,7 @@ public class Board : MonoBehaviour
         this.activePiece = this.gameObject.AddComponent<ActivePiece>();
         boardCamera.ActivateCamera();
         SpawnPiece();
-        InitializeGhost();
+        GhostPiece.InitializeGhost(this.gameObject);
     }
 
 
@@ -86,18 +88,7 @@ public class Board : MonoBehaviour
         return nextPiece;
     }
 
-    /// <summary>
-    /// Create the Ghost Piece gameobject and initialize
-    /// </summary>
-    private void InitializeGhost() {
-        GameObject ghostObject = new GameObject("Ghost");
-        ghostObject.transform.parent = this.transform;
-        ghostObject.AddComponent<Tilemap>();
-        ghostObject.AddComponent<TilemapRenderer>();
-        GhostPiece ghostPiece = ghostObject.AddComponent<GhostPiece>();
-        ghostPiece.Initialize();
 
-    }
 
     private void GameOver() {
         this.tilemap.ClearAllTiles();

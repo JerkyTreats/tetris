@@ -13,6 +13,18 @@ public class GhostPiece : MonoBehaviour
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
 
+    /// <summary>
+    /// Create the Ghost Piece gameobject and initialize
+    /// </summary>
+    public static void InitializeGhost(GameObject parent) {
+        GameObject ghostObject = new GameObject("Ghost");
+        ghostObject.transform.parent = parent.transform;
+        ghostObject.AddComponent<Tilemap>();
+        ghostObject.AddComponent<TilemapRenderer>();
+        GhostPiece ghostPiece = ghostObject.AddComponent<GhostPiece>();
+        ghostPiece.Initialize();
+    }
+
     public void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
         this.cells = new Vector3Int[4];
