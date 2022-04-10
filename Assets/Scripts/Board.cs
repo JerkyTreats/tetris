@@ -3,13 +3,12 @@ using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 public class Board : MonoBehaviour
 {
-    public TetrominoData[] tetrominos;
-    public Tile ghost;
+    public Vector3Int spawnPosition;
+    public Vector2Int boardSize = new Vector2Int(10,20);
+    public GameData gameData { get; private set; }
     public Tilemap tilemap { get; private set; }
     public ActivePiece activePiece { get; private set; }
-    public Vector3Int spawnPosition;
-    public List<Tetromino> spawnBag = new List<Tetromino>();
-    public Vector2Int boardSize = new Vector2Int(10,20);
+    public List<Tetromino> spawnBag { get; private set; }
     public BoardCamera boardCamera { get; private set; }
 
     public RectInt Bounds {
@@ -22,9 +21,12 @@ public class Board : MonoBehaviour
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
 
+        GameObject gameDataObject = GameObject.Find("GameData");
+        this.gameData = gameDataObject.GetComponent<GameData>();
+
         // Initialize each Tetromino listed in Editor object
-        for (int i = 0;  i < tetrominos.Length; i++) {
-            this.tetrominos[i].Initialize();
+        for (int i = 0;  i < this.gameData.tetrominos.Length; i++) {
+            this.gameData.tetrominos[i].Initialize();
         }
 
         // Initialize unactivated camera;
@@ -42,9 +44,10 @@ public class Board : MonoBehaviour
         this.activePiece = this.gameObject.AddComponent<ActivePiece>();
         boardCamera.ActivateCamera();
         SpawnPiece();
-        GhostPiece.InitializeGhost(this.gameObject);
+        GhostPiece.Initialize(this);
+        Border.Initialize(this);
+        BoardBackground.Initialize(this);
     }
-
 
     /// <summary>
     /// Spawn a new tetromino. Trigger Game Over state if applicable.
@@ -52,9 +55,9 @@ public class Board : MonoBehaviour
     public void SpawnPiece() {
         Tetromino nextPiece = GetNextPeice();
 
-        for (int i = 0; i < this.tetrominos.Length; i++){
-            if (this.tetrominos[i].tetromino == nextPiece) {
-                this.activePiece.Initialize(spawnPosition, this.tetrominos[i], this);
+        for (int i = 0; i < this.gameData.tetrominos.Length; i++){
+            if (this.gameData.tetrominos[i].tetromino == nextPiece) {
+                this.activePiece.Initialize(spawnPosition, this.gameData.tetrominos[i], this);
             }
         }
 
@@ -70,7 +73,7 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <returns>Tetromino Enum to spawn next</returns>
     private Tetromino GetNextPeice() {
-        if (this.spawnBag.Count == 0){
+        if (this.spawnBag == null || this.spawnBag.Count == 0){
             spawnBag = new List<Tetromino> {
                 Tetromino.I,
                 Tetromino.O,

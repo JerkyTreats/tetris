@@ -18,25 +18,24 @@ public class GhostPiece : MonoBehaviour
     /// <summary>
     /// Create the Ghost Piece gameobject and initialize
     /// </summary>
-    public static void InitializeGhost(GameObject parent) {
+    public static void Initialize(Board board) {
         GameObject ghostObject = new GameObject("Ghost");
-        ghostObject.transform.parent = parent.transform;
+        ghostObject.transform.parent = board.transform;
         ghostObject.AddComponent<Tilemap>();
-        ghostObject.AddComponent<TilemapRenderer>();
+        TilemapRenderer renderer = ghostObject.AddComponent<TilemapRenderer>();
+        renderer.sortingOrder = 1;
+
         GhostPiece ghostPiece = ghostObject.AddComponent<GhostPiece>();
-        ghostPiece.Initialize();
+        ghostPiece.board = board;
+        ghostPiece.trackingPiece = board.activePiece;
+        ghostPiece.tile = board.gameData.ghostTile;
+
+        ghostPiece.IsInitialized = true;
     }
 
     public void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
         this.cells = new Vector3Int[4];
-    }
-
-    public void Initialize() {
-        this.board = gameObject.GetComponentInParent<Board>();
-        this.trackingPiece = board.activePiece;
-        this.tile = board.ghost;
-        this.IsInitialized = true;
     }
 
     // Do late update to track when the real piece moves

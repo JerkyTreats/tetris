@@ -7,6 +7,19 @@ public class Border : MonoBehaviour
     public BorderPieceData[] borderPieces;
     public Tilemap tilemap { get; private set; }
 
+    /// <summary>
+    /// Create the Border gameobject and initialize
+    /// </summary>
+    public static void Initialize(Board board) {
+        GameObject border = new GameObject("Boarder");
+        border.transform.parent = board.transform;
+        border.AddComponent<Tilemap>();
+        border.AddComponent<TilemapRenderer>();
+        Border borderComp = border.AddComponent<Border>();
+        borderComp.board = board;
+        borderComp.borderPieces = board.gameData.borderPieces;
+    }
+
 
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
