@@ -5,6 +5,7 @@ public class Board : MonoBehaviour
 {
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10,20);
+    public Vector3Int cameraPosition = new Vector3Int(0,0,-10);
     public GameData gameData { get; private set; }
     public Tilemap tilemap { get; private set; }
     public ActivePiece activePiece { get; private set; }
@@ -30,7 +31,7 @@ public class Board : MonoBehaviour
         }
 
         // Initialize unactivated camera;
-        boardCamera = new BoardCamera(this.gameObject);
+        boardCamera = new BoardCamera(this.gameObject, this.cameraPosition);
     }
 
     void Start() {

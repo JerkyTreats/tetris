@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 392443690}
   - component: {fileID: 392443689}
   - component: {fileID: 392443691}
-  - component: {fileID: 392443692}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -183,20 +182,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPosition: {x: -1, y: 7, z: 0}
   boardSize: {x: 10, y: 20}
---- !u!114 &392443692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 392443688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a69c93d40615e46e29e17d49aa10906f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stepDelay: 1
-  lockDelay: 0.5
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,16 +4,15 @@ public class BoardCamera
 {
     public GameObject boardCamera;
 
-    public BoardCamera(GameObject parent){
-        InitializeCamera(parent);
+    public BoardCamera(GameObject parent, Vector3Int cameraPosition){
+        InitializeCamera(parent, cameraPosition);
     }
     /// <summary>
     /// Creates a camera object to focus on this board.
-    /// TODO : Make the transform position a variable that can be saved.
     /// </summary>
-    public void InitializeCamera(GameObject parent) {
+    public void InitializeCamera(GameObject parent, Vector3Int cameraPosition) {
         this.boardCamera = new GameObject("camera");
-        this.boardCamera.transform.position = new Vector3(0, 0, -10.0f);
+        this.boardCamera.transform.position = (Vector3)cameraPosition;
         this.boardCamera.SetActive(false);
 
         this.boardCamera.AddComponent<Camera>();
