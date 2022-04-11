@@ -72,7 +72,7 @@ public class GhostPiece : MonoBehaviour
     /// Drops the piece to the correct row
     /// </summary>
     private void Drop() {
-        RectInt bounds = this.board.Bounds;
+        RectInt bounds = this.board.WorldBounds;
         int row = this.trackingPiece.position.y - 1;
 
         // Wrap logic in Clear/Set as IsValidPosition will be false

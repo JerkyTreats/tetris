@@ -14,7 +14,6 @@ public class Border : MonoBehaviour
     public static void Initialize(Board board) {
         GameObject border = new GameObject("Border");
         border.transform.parent = board.transform;
-        border.transform.position = board.transform.position;
         border.AddComponent<Tilemap>();
         border.AddComponent<TilemapRenderer>();
         Border borderComp = border.AddComponent<Border>();
@@ -28,7 +27,7 @@ public class Border : MonoBehaviour
     }
 
     public void DrawBorder() {
-        RectInt bounds = this.board.Bounds;
+        RectInt bounds = this.board.WorldBounds;
 
         // Draw top/bottom border
         for (int col = bounds.xMin; col < bounds.xMax; col++) {

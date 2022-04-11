@@ -4,8 +4,8 @@ using System.Collections.Generic;
 public class Board : MonoBehaviour
 {
     public Vector3Int spawnPosition;
-    public Vector2Int boardSize = new Vector2Int(10,20);
-    public Vector3Int cameraPosition = new Vector3Int(0,0,-10);
+    public Vector2Int boardSize;
+    public Vector3Int cameraPosition;
     public Vector3Int boardPosition;
     public GameData gameData { get; private set; }
     public Tilemap tilemap { get; private set; }
@@ -13,19 +13,46 @@ public class Board : MonoBehaviour
     public List<Tetromino> spawnBag { get; private set; }
     public BoardCamera boardCamera { get; private set; }
 
-    public RectInt Bounds {
+    /// <summary>
+    /// Rectangle representing the board in WorldSpace
+    /// </summary>
+    public RectInt WorldBounds {
         get {
+
+            // Origin is middle of rect, position is bottom left
             Vector2Int position = new Vector2Int(
                 this.boardPosition.x - this.boardSize.x / 2,
                 this.boardPosition.y - this.boardSize.y / 2
             );
 
-            Vector2Int size = new Vector2Int(
-                this.boardPosition.x + this.boardSize.x,
-                this.boardPosition.y + this.boardSize.y
-            );
-            return new RectInt(position, size);
+            return new RectInt(position, this.boardSize);
         }
+    }
+
+    /// <summary>
+    /// Rectangle representing the board in TileSpace (Origin is always 0,0)
+    /// </summary>
+    public RectInt TileBounds {
+        get {
+            // bottom left
+            Vector2Int position = new Vector2Int(
+                -this.boardSize.x / 2,
+                -this.boardSize.y / 2
+            );
+
+            return new RectInt(position, this.boardSize);
+        }
+    }
+
+    /// <summary>
+    /// EDITOR: Draw the WorldBounds so inspect while game is paused
+    /// </summary>
+    void OnDrawGizmosSelected()
+    {
+        // Draw a yellow cube at the transform position
+        Gizmos.color = Color.yellow;
+        // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+        Gizmos.DrawWireCube(this.transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
     }
 
     /// <summary>
@@ -47,6 +74,7 @@ public class Board : MonoBehaviour
         renderer.sortingOrder = sortOrder;
 
         Board board = boardGO.AddComponent<Board>();
+        board.boardPosition = boardPosition;
         board.spawnPosition = spawnPosition;
         board.boardSize = boardSize;
         board.cameraPosition = cameraPosition;
@@ -171,12 +199,10 @@ public class Board : MonoBehaviour
     /// <param name="newPosition"></param>
     /// <returns>bool</returns>
     public bool IsValidPosition(ActivePiece piece, Vector3Int newPosition) {
-        RectInt bounds = this.Bounds;
-
         for (int i = 0; i < piece.cells.Length; i++ ) {
             Vector3Int tilePosition = piece.cells[i] + newPosition;
 
-            if (!bounds.Contains((Vector2Int)tilePosition)) {
+            if (!this.TileBounds.Contains((Vector2Int)tilePosition)) {
                 return false;
             }
 
@@ -191,7 +217,7 @@ public class Board : MonoBehaviour
     /// Clear a fully completed line
     /// </summary>
     public void CheckClearedLines() {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
         int row = bounds.yMin;
         while(row < bounds.yMax) {
             if (IsLineFull(row)) {
@@ -208,7 +234,7 @@ public class Board : MonoBehaviour
     /// <param name="row">Row index to check</param>
     /// <returns>bool</returns>
     private bool IsLineFull(int row) {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
 
         // For each column in a row, determine if a Tile is missing
         for (int col = bounds.xMin; col < bounds.xMax; col++) {
@@ -227,7 +253,7 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="row">Row index to clear</param>
     private void LineClear(int row) {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
 
         // For each column in a row, set the Tile to null
         for (int col = bounds.xMin; col < bounds.xMax; col++) {
