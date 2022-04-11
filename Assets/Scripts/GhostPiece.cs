@@ -28,6 +28,7 @@ public class GhostPiece : MonoBehaviour
         GhostPiece ghostPiece = ghostObject.AddComponent<GhostPiece>();
         ghostPiece.board = board;
         ghostPiece.trackingPiece = board.activePiece;
+        ghostPiece.transform.position = ghostPiece.trackingPiece.transform.position;
         ghostPiece.tile = board.gameData.ghostTile;
 
         ghostPiece.IsInitialized = true;

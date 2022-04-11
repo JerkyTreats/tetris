@@ -6,6 +6,7 @@ public class Board : MonoBehaviour
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10,20);
     public Vector3Int cameraPosition = new Vector3Int(0,0,-10);
+    public Vector3Int boardPosition;
     public GameData gameData { get; private set; }
     public Tilemap tilemap { get; private set; }
     public ActivePiece activePiece { get; private set; }
@@ -14,9 +15,47 @@ public class Board : MonoBehaviour
 
     public RectInt Bounds {
         get {
-            Vector2Int position = new Vector2Int(-this.boardSize.x / 2, -this.boardSize.y / 2);
-            return new RectInt(position, boardSize);
+            Vector2Int position = new Vector2Int(
+                this.boardPosition.x - this.boardSize.x / 2,
+                this.boardPosition.y - this.boardSize.y / 2
+            );
+
+            Vector2Int size = new Vector2Int(
+                this.boardPosition.x + this.boardSize.x,
+                this.boardPosition.y + this.boardSize.y
+            );
+            return new RectInt(position, size);
         }
+    }
+
+    /// <summary>
+    /// Creates a new board object
+    /// </summary>
+    /// <param name="spawnPosition">Spawn position for each Active Piece</param>
+    /// <param name="cameraPosition">Camera position for the board</param>
+    /// <param name="boardPosition">Position of the board</param>
+    /// <param name="boardSize">Size of the board in tiles</param>
+    /// <param name="sortOrder">Tilemap sort order, larger means most visible layer</param>
+    /// <returns>Created Board</returns>
+    public static Board Initialize(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder) {
+        GameObject boardGO = new GameObject("Board");
+        boardGO.AddComponent<Grid>();
+        boardGO.transform.position = boardPosition;
+
+        boardGO.AddComponent<Tilemap>();
+        TilemapRenderer renderer = boardGO.AddComponent<TilemapRenderer>();
+        renderer.sortingOrder = sortOrder;
+
+        Board board = boardGO.AddComponent<Board>();
+        board.spawnPosition = spawnPosition;
+        board.boardSize = boardSize;
+        board.cameraPosition = cameraPosition;
+        board.boardCamera = new BoardCamera(board.gameObject, cameraPosition);
+
+        Border.Initialize(board);
+        BoardBackground.Initialize(board);
+
+        return board;
     }
 
     private void Awake() {
@@ -29,25 +68,27 @@ public class Board : MonoBehaviour
         for (int i = 0;  i < this.gameData.tetrominos.Length; i++) {
             this.gameData.tetrominos[i].Initialize();
         }
-
-        // Initialize unactivated camera;
-        boardCamera = new BoardCamera(this.gameObject, this.cameraPosition);
     }
 
     void Start() {
-        ActivateGameOnBoard();
+        // ActivateGameOnBoard();
     }
 
     /// <summary>
     /// Make this board the active one with the game playing.
     /// </summary>
-    private void ActivateGameOnBoard() {
+    public void ActivateGameOnBoard() {
         this.activePiece = this.gameObject.AddComponent<ActivePiece>();
         boardCamera.ActivateCamera();
         SpawnPiece();
         GhostPiece.Initialize(this);
-        Border.Initialize(this);
-        BoardBackground.Initialize(this);
+    }
+
+    public void DeactivateGame() {
+        Destroy(this.GetComponentInChildren<GhostPiece>().gameObject);
+        Destroy(this.activePiece);
+        boardCamera.DeactivateCamera();
+        this.tilemap.ClearAllTiles();
     }
 
     /// <summary>
@@ -62,6 +103,7 @@ public class Board : MonoBehaviour
             }
         }
 
+        // False if there is a piece colliding in spawn position.
         if (IsValidPosition(this.activePiece, this.spawnPosition)) {
             Set(this.activePiece);
         } else {

@@ -13,6 +13,7 @@ public class BoardBackground : MonoBehaviour
     public static void Initialize(Board board) {
         GameObject backgroundGO = new GameObject("BoardBackground");
         backgroundGO.transform.parent = board.transform;
+        backgroundGO.transform.position = board.transform.position;
         backgroundGO.AddComponent<Tilemap>();
         backgroundGO.AddComponent<TilemapRenderer>();
         BoardBackground borderComp = backgroundGO.AddComponent<BoardBackground>();
