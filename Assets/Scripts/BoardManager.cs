@@ -7,24 +7,10 @@ using UnityEngine;
 /// </summary>
 public class BoardManager : MonoBehaviour
 {
-    // public static void Initialize(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder) {
-
-    /// <summary>
-    /// Should probably turn this into the serializable entity.
-    /// </summary>
-    public struct boardStruct {
-        public Vector3Int spawnPosition;
-        public Vector3Int cameraPosition;
-        public Vector3Int boardPosition;
-        public Vector2Int boardSize;
-        public int sortOrder;
-    }
-
-    public List<boardStruct> boards;
     public List<Board> boardObjects;
     public int currentBoard = 1;
 
-    public boardStruct board1 = new boardStruct
+    public BoardData board1 = new BoardData
     {
         spawnPosition = new Vector3Int(-1, 7, 0),
         cameraPosition = new Vector3Int(0, 0, -10),
@@ -37,19 +23,17 @@ public class BoardManager : MonoBehaviour
     /// Create 3 boards. First is the standard Tetris board as you would expect, the other two randomize the size.
     /// </summary>
     void Populate() {
-        List<boardStruct> boards = new List<boardStruct>();
+        List<BoardData> boards = new List<BoardData>();
         boards.Add(board1);
         Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
         boardObjects.Add(b);
 
         for (int i = 0; i < 2; i++) {
-            boardStruct nextBoard = GetNextBoard(boards[boards.Count-1]);
+            BoardData nextBoard = GetNextBoard(boards[boards.Count-1]);
             boards.Add(nextBoard);
             b = Board.Initialize(nextBoard.spawnPosition, nextBoard.cameraPosition, nextBoard.boardPosition, nextBoard.boardSize, 2);
             boardObjects.Add(b);
         }
-
-        this.boards = boards;
     }
 
     /// <summary>
@@ -57,7 +41,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     /// <param name="previousBoard"></param>
     /// <returns></returns>
-    boardStruct GetNextBoard(boardStruct previousBoard) {
+    BoardData GetNextBoard(BoardData previousBoard) {
         Vector2Int nextBoardSize = new Vector2Int((Random.Range(5, 10) * 2), (Random.Range(5, 10) * 2));
         int nextBoardSizeXOrigin = nextBoardSize.x / 2;
         int buffer = 1;
@@ -82,7 +66,7 @@ public class BoardManager : MonoBehaviour
             -10
         );
 
-        return new boardStruct {
+        return new BoardData {
             spawnPosition = nextSpawn,
             cameraPosition = nextCam,
             boardPosition = nextBoardPos,

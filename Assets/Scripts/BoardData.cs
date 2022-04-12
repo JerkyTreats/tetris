@@ -8,11 +8,15 @@ public struct BoardData {
 
     [ProtoMember(1)]
     public Vector3Int spawnPosition;
-
     [ProtoMember(2)]
-    public Vector2Int boardSize;
-
+    public Vector3Int cameraPosition;
     [ProtoMember(3)]
+    public Vector3Int boardPosition;
+    [ProtoMember(4)]
+    public Vector2Int boardSize;
+    [ProtoMember(5)]
+    public int sortOrder;
+    [ProtoMember(6)]
     public List<BoardTileData> tiles;
 }
 
