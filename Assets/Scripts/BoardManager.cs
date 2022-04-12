@@ -23,25 +23,26 @@ public class BoardManager : MonoBehaviour
     /// Create 3 boards. First is the standard Tetris board as you would expect, the other two randomize the size.
     /// </summary>
     void Populate() {
+
         List<BoardData> boards = new List<BoardData>();
         boards.Add(board1);
         Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
         boardObjects.Add(b);
 
-        List<BoardTileData> board2Tiles = new List<BoardTileData>();
+        // List<BoardTileData> board2Tiles = new List<BoardTileData>();
 
 
-        BoardData board2 = new BoardData
-        {
-            spawnPosition = new Vector3Int(-1, 7, 0),
-            cameraPosition = new Vector3Int(0, 0, -10),
-            boardPosition = new Vector3Int(0, 0, 0),
-            boardSize = new Vector2Int(10,20),
-            sortOrder = 2,
-            tiles = board2Tiles
-        };
+        // BoardData board2 = new BoardData
+        // {
+        //     spawnPosition = new Vector3Int(-1, 7, 0),
+        //     cameraPosition = new Vector3Int(0, 0, -10),
+        //     boardPosition = new Vector3Int(0, 0, 0),
+        //     boardSize = new Vector2Int(10,20),
+        //     sortOrder = 2,
+        //     tiles = board2Tiles
+        // };
 
-        for (int i = 0; i < (boards.Count + 2); i++) {
+        for (int i = 0; i < 2; i++) {
             BoardData nextBoard = GetNextBoard(boards[boards.Count-1]);
             boards.Add(nextBoard);
             b = Board.Initialize(nextBoard.spawnPosition, nextBoard.cameraPosition, nextBoard.boardPosition, nextBoard.boardSize, 2);
