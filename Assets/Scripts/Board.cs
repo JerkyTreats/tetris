@@ -3,51 +3,120 @@ using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 public class Board : MonoBehaviour
 {
-    public TetrominoData[] tetrominos;
-    public Tilemap tilemap { get; private set; }
-    public Piece activePiece { get; private set; }
     public Vector3Int spawnPosition;
-    public List<Tetromino> spawnBag = new List<Tetromino>();
-    public Vector2Int boardSize = new Vector2Int(10,20);
-    public GameObject boardCamera { get; private set; }
-    public RectInt Bounds {
+    public Vector2Int boardSize;
+    public Vector3Int cameraPosition;
+    public Vector3Int boardPosition;
+    public GameData gameData { get; private set; }
+    public Tilemap tilemap { get; private set; }
+    public ActivePiece activePiece { get; private set; }
+    public List<Tetromino> spawnBag { get; private set; }
+    public BoardCamera boardCamera { get; private set; }
+
+    /// <summary>
+    /// Rectangle representing the board in WorldSpace
+    /// </summary>
+    public RectInt WorldBounds {
         get {
-            Vector2Int position = new Vector2Int(-this.boardSize.x / 2, -this.boardSize.y / 2);
-            return new RectInt(position, boardSize);
+
+            // Origin is middle of rect, position is bottom left
+            Vector2Int position = new Vector2Int(
+                this.boardPosition.x - this.boardSize.x / 2,
+                this.boardPosition.y - this.boardSize.y / 2
+            );
+
+            return new RectInt(position, this.boardSize);
         }
     }
+
+    /// <summary>
+    /// Rectangle representing the board in TileSpace (Origin is always 0,0)
+    /// </summary>
+    public RectInt TileBounds {
+        get {
+            // bottom left
+            Vector2Int position = new Vector2Int(
+                -this.boardSize.x / 2,
+                -this.boardSize.y / 2
+            );
+
+            return new RectInt(position, this.boardSize);
+        }
+    }
+
+    /// <summary>
+    /// EDITOR: Draw the WorldBounds so inspect while game is paused
+    /// </summary>
+    void OnDrawGizmosSelected()
+    {
+        // Draw a yellow cube at the transform position
+        Gizmos.color = Color.yellow;
+        // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+        Gizmos.DrawWireCube(this.transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+    }
+
+    /// <summary>
+    /// Creates a new board object
+    /// </summary>
+    /// <param name="spawnPosition">Spawn position for each Active Piece</param>
+    /// <param name="cameraPosition">Camera position for the board</param>
+    /// <param name="boardPosition">Position of the board</param>
+    /// <param name="boardSize">Size of the board in tiles</param>
+    /// <param name="sortOrder">Tilemap sort order, larger means most visible layer</param>
+    /// <returns>Created Board</returns>
+    public static Board Initialize(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder) {
+        GameObject boardGO = new GameObject("Board");
+        boardGO.AddComponent<Grid>();
+        boardGO.transform.position = boardPosition;
+
+        boardGO.AddComponent<Tilemap>();
+        TilemapRenderer renderer = boardGO.AddComponent<TilemapRenderer>();
+        renderer.sortingOrder = sortOrder;
+
+        Board board = boardGO.AddComponent<Board>();
+        board.boardPosition = boardPosition;
+        board.spawnPosition = spawnPosition;
+        board.boardSize = boardSize;
+        board.cameraPosition = cameraPosition;
+        board.boardCamera = new BoardCamera(board.gameObject, cameraPosition);
+
+        Border.Initialize(board);
+        BoardBackground.Initialize(board);
+
+        return board;
+    }
+
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
-        this.activePiece = GetComponentInChildren<Piece>();
 
-        for (int i = 0;  i < tetrominos.Length; i++) {
-            this.tetrominos[i].Initialize();
+        GameObject gameDataObject = GameObject.Find("GameData");
+        this.gameData = gameDataObject.GetComponent<GameData>();
+
+        // Initialize each Tetromino listed in Editor object
+        for (int i = 0;  i < this.gameData.tetrominos.Length; i++) {
+            this.gameData.tetrominos[i].Initialize();
         }
-
-        InitializeCamera();
     }
 
-    private void InitializeCamera() {
-        this.boardCamera = new GameObject("camera");
-        this.boardCamera.transform.position = new Vector3(0, 0, -10.0f);
-        this.boardCamera.SetActive(false);
-
-        this.boardCamera.AddComponent<Camera>();
-        this.boardCamera.transform.parent = this.transform;
-
-        Camera camera = this.boardCamera.GetComponentInChildren<Camera>();
-        camera.orthographic = true;
-        camera.orthographicSize = 12.00f;
+    void Start() {
+        // ActivateGameOnBoard();
     }
 
-    private void ActivateCamera() {
-        this.boardCamera.tag = "MainCamera"; // sets Camera.main property
-        this.boardCamera.SetActive(true);
-    }
-
-    private void Start() {
-        ActivateCamera();
+    /// <summary>
+    /// Make this board the active one with the game playing.
+    /// </summary>
+    public void ActivateGameOnBoard() {
+        this.activePiece = this.gameObject.AddComponent<ActivePiece>();
+        boardCamera.ActivateCamera();
         SpawnPiece();
+        GhostPiece.Initialize(this);
+    }
+
+    public void DeactivateGame() {
+        Destroy(this.GetComponentInChildren<GhostPiece>().gameObject);
+        Destroy(this.activePiece);
+        boardCamera.DeactivateCamera();
+        this.tilemap.ClearAllTiles();
     }
 
     /// <summary>
@@ -56,12 +125,13 @@ public class Board : MonoBehaviour
     public void SpawnPiece() {
         Tetromino nextPiece = GetNextPeice();
 
-        for (int i = 0; i < this.tetrominos.Length; i++){
-            if (this.tetrominos[i].tetromino == nextPiece) {
-                this.activePiece.Initialize(spawnPosition, this.tetrominos[i], this);
+        for (int i = 0; i < this.gameData.tetrominos.Length; i++){
+            if (this.gameData.tetrominos[i].tetromino == nextPiece) {
+                this.activePiece.Initialize(spawnPosition, this.gameData.tetrominos[i], this);
             }
         }
 
+        // False if there is a piece colliding in spawn position.
         if (IsValidPosition(this.activePiece, this.spawnPosition)) {
             Set(this.activePiece);
         } else {
@@ -74,7 +144,7 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <returns>Tetromino Enum to spawn next</returns>
     private Tetromino GetNextPeice() {
-        if (this.spawnBag.Count == 0){
+        if (this.spawnBag == null || this.spawnBag.Count == 0){
             spawnBag = new List<Tetromino> {
                 Tetromino.I,
                 Tetromino.O,
@@ -97,14 +167,14 @@ public class Board : MonoBehaviour
     private void GameOver() {
         this.tilemap.ClearAllTiles();
 
-        //...
+        // TODO : Something useful with this
     }
 
     /// <summary>
     /// Set piece on board
     /// </summary>
     /// <param name="piece"></param>
-    public void Set(Piece piece) {
+    public void Set(ActivePiece piece) {
         for (int i = 0; i < piece.cells.Length; i++) {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             this.tilemap.SetTile(tilePosition, piece.data.tile);
@@ -115,7 +185,7 @@ public class Board : MonoBehaviour
     /// Remove peice from board
     /// </summary>
     /// <param name="piece"></param>
-    public void Clear(Piece piece) {
+    public void Clear(ActivePiece piece) {
         for (int i = 0; i < piece.cells.Length; i++) {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             this.tilemap.SetTile(tilePosition, null);
@@ -128,13 +198,11 @@ public class Board : MonoBehaviour
     /// <param name="piece"></param>
     /// <param name="newPosition"></param>
     /// <returns>bool</returns>
-    public bool IsValidPosition(Piece piece, Vector3Int newPosition) {
-        RectInt bounds = this.Bounds;
-
+    public bool IsValidPosition(ActivePiece piece, Vector3Int newPosition) {
         for (int i = 0; i < piece.cells.Length; i++ ) {
             Vector3Int tilePosition = piece.cells[i] + newPosition;
 
-            if (!bounds.Contains((Vector2Int)tilePosition)) {
+            if (!this.TileBounds.Contains((Vector2Int)tilePosition)) {
                 return false;
             }
 
@@ -149,7 +217,7 @@ public class Board : MonoBehaviour
     /// Clear a fully completed line
     /// </summary>
     public void CheckClearedLines() {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
         int row = bounds.yMin;
         while(row < bounds.yMax) {
             if (IsLineFull(row)) {
@@ -166,7 +234,7 @@ public class Board : MonoBehaviour
     /// <param name="row">Row index to check</param>
     /// <returns>bool</returns>
     private bool IsLineFull(int row) {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
 
         // For each column in a row, determine if a Tile is missing
         for (int col = bounds.xMin; col < bounds.xMax; col++) {
@@ -185,7 +253,7 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="row">Row index to clear</param>
     private void LineClear(int row) {
-        RectInt bounds = this.Bounds;
+        RectInt bounds = this.TileBounds;
 
         // For each column in a row, set the Tile to null
         for (int col = bounds.xMin; col < bounds.xMax; col++) {
@@ -207,5 +275,4 @@ public class Board : MonoBehaviour
             row++;
         }
     }
-
 }

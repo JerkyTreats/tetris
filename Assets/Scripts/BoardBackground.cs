@@ -7,6 +7,20 @@ public class BoardBackground : MonoBehaviour
     public Tile gridTile;
     public Tilemap tileMap { get; private set; }
 
+    /// <summary>
+    /// Create the BoardBackground gameobject and initialize
+    /// </summary>
+    public static void Initialize(Board board) {
+        GameObject backgroundGO = new GameObject("BoardBackground");
+        backgroundGO.transform.parent = board.transform;
+        backgroundGO.AddComponent<Tilemap>();
+        backgroundGO.AddComponent<TilemapRenderer>();
+        BoardBackground borderComp = backgroundGO.AddComponent<BoardBackground>();
+        borderComp.board = board;
+        borderComp.gridTile = board.gameData.gridTile;
+    }
+
+
     public void Awake() {
         this.tileMap = GetComponentInChildren<Tilemap>();
     }
@@ -16,7 +30,7 @@ public class BoardBackground : MonoBehaviour
     }
 
     public void DrawGrid() {
-        RectInt bounds = this.board.Bounds;
+        RectInt bounds = this.board.WorldBounds;
 
         for (int row = bounds.yMin; row < bounds.yMax; row++) {
             for (int col = bounds.xMin; col < bounds.xMax; col++) {

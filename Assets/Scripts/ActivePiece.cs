@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Piece : MonoBehaviour
+public class ActivePiece : MonoBehaviour
 {
     public Board board { get; private set; }
     public TetrominoData data { get; private set; }
@@ -14,7 +14,7 @@ public class Piece : MonoBehaviour
 
     private float stepTime;
     private float lockTime;
-
+    private bool IsInitialized = false;
 
     public void Initialize(Vector3Int spawnPosition, TetrominoData data, Board board) {
         this.board = board;
@@ -30,40 +30,44 @@ public class Piece : MonoBehaviour
         for (int i = 0; i < data.cells.Length; i++) {
             this.cells[i] = (Vector3Int)data.cells[i];
         }
+
+        this.IsInitialized = true;
     }
 
     public void Update() {
-        this.board.Clear(this);
+        if (IsInitialized) {
+            this.board.Clear(this);
 
-        this.lockTime += Time.deltaTime;
+            this.lockTime += Time.deltaTime;
 
-        if (Input.GetKeyDown(KeyCode.Q)) {
-        Rotate(-1);
+            if (Input.GetKeyDown(KeyCode.Q)) {
+            Rotate(-1);
+            }
+
+            if (Input.GetKeyDown(KeyCode.E)) {
+            Rotate(1);
+            }
+
+            if (Input.GetKeyDown(KeyCode.A)) {
+            Move(Vector2Int.left);
+            } else if (Input.GetKeyDown(KeyCode.D)) {
+            Move(Vector2Int.right);
+            }
+
+            if (Input.GetKeyDown(KeyCode.S)) {
+            Move(Vector2Int.down);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space)) {
+            HardDrop();
+            }
+
+            if (Time.time >= this.stepTime) {
+                Step();
+            }
+
+            this.board.Set(this);
         }
-
-        if (Input.GetKeyDown(KeyCode.E)) {
-        Rotate(1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.A)) {
-        Move(Vector2Int.left);
-        } else if (Input.GetKeyDown(KeyCode.D)) {
-        Move(Vector2Int.right);
-        }
-
-        if (Input.GetKeyDown(KeyCode.S)) {
-        Move(Vector2Int.down);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space)) {
-        HardDrop();
-        }
-
-        if (Time.time >= this.stepTime) {
-            Step();
-        }
-
-        this.board.Set(this);
     }
 
     private void Step() {

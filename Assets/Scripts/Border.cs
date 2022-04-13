@@ -5,20 +5,29 @@ public class Border : MonoBehaviour
 {
     public Board board;
     public BorderPieceData[] borderPieces;
+    public Vector3 thisPosition;
     public Tilemap tilemap { get; private set; }
 
+    /// <summary>
+    /// Create the Border gameobject and initialize
+    /// </summary>
+    public static void Initialize(Board board) {
+        GameObject border = new GameObject("Border");
+        border.transform.parent = board.transform;
+        border.AddComponent<Tilemap>();
+        border.AddComponent<TilemapRenderer>();
+        Border borderComp = border.AddComponent<Border>();
+        borderComp.board = board;
+        borderComp.borderPieces = board.gameData.borderPieces;
+        borderComp.DrawBorder();
+    }
 
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
     }
 
-    private void Start() {
-        DrawBorder();
-    }
-
     public void DrawBorder() {
-        RectInt bounds = this.board.Bounds;
-
+        RectInt bounds = this.board.WorldBounds;
 
         // Draw top/bottom border
         for (int col = bounds.xMin; col < bounds.xMax; col++) {
