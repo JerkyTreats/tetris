@@ -13,6 +13,7 @@ Basically an exact copy of the (amazing) [YouTube tutorial](https://www.youtube.
 - ~~Dynamic Background Grid~~
 - ~~Add proper new peice queue (A bag containing each piece randomly chosen until every piece chosen, then create new bag). "Real" Tetris shouldn't be full random Piece selection.~~
 - ~~Dynamic Camera~~
+- ~~Mutliple Boards~~
 - Score/Reward
 - Scaling Speed on line(s) cleared.
 
