@@ -86,6 +86,10 @@ public class Board : MonoBehaviour
         return board;
     }
 
+    public static Board Initialize(BoardData boardData) {
+        return Initialize(boardData.spawnPosition, boardData.cameraPosition, boardData.boardPosition, boardData.boardSize, boardData.sortOrder);
+    }
+
     private void Awake() {
         this.tilemap = GetComponentInChildren<Tilemap>();
 
