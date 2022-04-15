@@ -10,19 +10,14 @@ public class BoardBackground : MonoBehaviour
     /// <summary>
     /// Create the BoardBackground GameObject and initialize
     /// </summary>
-    public static void CreateBoardBackground(Board board) {
-        var backgroundGo = new GameObject("BoardBackground")
-        {
-            transform =
-            {
-                parent = board.transform
-            }
-        };
-        backgroundGo.AddComponent<Tilemap>();
-        backgroundGo.AddComponent<TilemapRenderer>();
-        var boardBackground = backgroundGo.AddComponent<BoardBackground>();
+    public static GameObject CreateBoardBackground(Board board)
+    {
+        var backgroundObject = TileGameObjectFactory.CreateNewTileObject("BoardBackground", Vector3Int.zero, 0, board.transform);
+        var boardBackground = backgroundObject.AddComponent<BoardBackground>();
         boardBackground.board = board;
         boardBackground.gridTile = board.GameData.gridTile;
+
+        return backgroundObject;
     }
 
 

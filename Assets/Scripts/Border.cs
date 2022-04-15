@@ -6,26 +6,21 @@ public class Border : MonoBehaviour
     public Board board;
     public BorderPieceData[] borderPieces;
     public Vector3 thisPosition;
-    public Tilemap Tilemap { get; private set; }
+    private Tilemap Tilemap { get; set; }
 
     /// <summary>
-    /// Create the Border gameobject and initialize
+    /// Create the Border GameObject and initialize
     /// </summary>
-    public static void CreateBoardBorder(Board board) {
-        var borderObject = new GameObject("Border")
-        {
-            transform =
-            {
-                parent = board.transform
-            }
-        };
-        borderObject.AddComponent<Tilemap>();
-        borderObject.AddComponent<TilemapRenderer>();
+    public static GameObject CreateBoardBorder(Board board)
+    {
+        var borderObject = TileGameObjectFactory.CreateNewTileObject("Border", Vector3Int.zero, 0, board.transform);
         
         var border = borderObject.AddComponent<Border>();
         border.board = board;
         border.borderPieces = board.GameData.borderPieces;
         border.DrawBorder();
+
+        return borderObject;
     }
 
     private void Awake() {
