@@ -2,41 +2,40 @@ using UnityEngine;
 
 public class BoardCamera
 {
-    public GameObject boardCamera;
-    public Camera camera;
+    private readonly GameObject _boardCamera;
+    private readonly Camera _camera;
 
     public BoardCamera(GameObject parent, Vector3Int cameraPosition){
-        InitializeCamera(parent, cameraPosition);
+        _boardCamera = new GameObject("Camera")
+        {
+            transform =
+            {
+                position = (Vector3)cameraPosition
+            }
+        };
+        _boardCamera.SetActive(false);
+
+        _boardCamera.AddComponent<Camera>();
+        _boardCamera.transform.parent = parent.transform;
+
+        _camera = _boardCamera.GetComponentInChildren<Camera>();
+        _camera.orthographic = true;
+        _camera.orthographicSize = 12.00f;
     }
-    /// <summary>
-    /// Creates a camera object to focus on this board.
-    /// </summary>
-    public void InitializeCamera(GameObject parent, Vector3Int cameraPosition) {
-        this.boardCamera = new GameObject("Camera");
-        this.boardCamera.transform.position = (Vector3)cameraPosition;
-        this.boardCamera.SetActive(false);
-
-        this.boardCamera.AddComponent<Camera>();
-        this.boardCamera.transform.parent = parent.transform;
-
-        this.camera = this.boardCamera.GetComponentInChildren<Camera>();
-        camera.orthographic = true;
-        camera.orthographicSize = 12.00f;
-    }
-
+    
     /// <summary>
     /// Makes this camera the one the user will be viewing.
     /// </summary>
     public void ActivateCamera() {
-        this.boardCamera.tag = "MainCamera"; // sets Camera.main property
-        this.boardCamera.SetActive(true);
-        this.camera.enabled = true;
+        _boardCamera.tag = "MainCamera"; // sets Camera.main property
+        _boardCamera.SetActive(true);
+        _camera.enabled = true;
         // this.camera.enabled
     }
 
     public void DeactivateCamera() {
-        this.camera.enabled = false;
-        this.boardCamera.SetActive(false);
+        _camera.enabled = false;
+        _boardCamera.SetActive(false);
     }
 
 }

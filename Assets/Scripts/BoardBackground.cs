@@ -5,37 +5,42 @@ public class BoardBackground : MonoBehaviour
 {
     public Board board;
     public Tile gridTile;
-    public Tilemap tileMap { get; private set; }
+    private Tilemap TileMap { get; set; }
 
     /// <summary>
-    /// Create the BoardBackground gameobject and initialize
+    /// Create the BoardBackground GameObject and initialize
     /// </summary>
-    public static void Initialize(Board board) {
-        GameObject backgroundGO = new GameObject("BoardBackground");
-        backgroundGO.transform.parent = board.transform;
-        backgroundGO.AddComponent<Tilemap>();
-        backgroundGO.AddComponent<TilemapRenderer>();
-        BoardBackground borderComp = backgroundGO.AddComponent<BoardBackground>();
-        borderComp.board = board;
-        borderComp.gridTile = board.gameData.gridTile;
+    public static void CreateBoardBackground(Board board) {
+        var backgroundGo = new GameObject("BoardBackground")
+        {
+            transform =
+            {
+                parent = board.transform
+            }
+        };
+        backgroundGo.AddComponent<Tilemap>();
+        backgroundGo.AddComponent<TilemapRenderer>();
+        var boardBackground = backgroundGo.AddComponent<BoardBackground>();
+        boardBackground.board = board;
+        boardBackground.gridTile = board.GameData.gridTile;
     }
 
 
     public void Awake() {
-        this.tileMap = GetComponentInChildren<Tilemap>();
+        TileMap = GetComponentInChildren<Tilemap>();
     }
 
     public void Start() {
         DrawGrid();
     }
 
-    public void DrawGrid() {
-        RectInt bounds = this.board.WorldBounds;
+    private void DrawGrid() {
+        var bounds = board.WorldBounds;
 
-        for (int row = bounds.yMin; row < bounds.yMax; row++) {
-            for (int col = bounds.xMin; col < bounds.xMax; col++) {
-                Vector3Int pos = new Vector3Int(col, row, 0);
-                this.tileMap.SetTile(pos, this.gridTile);
+        for (var row = bounds.yMin; row < bounds.yMax; row++) {
+            for (var col = bounds.xMin; col < bounds.xMax; col++) {
+                var pos = new Vector3Int(col, row, 0);
+                TileMap.SetTile(pos, gridTile);
             }
         }
     }

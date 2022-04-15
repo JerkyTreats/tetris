@@ -1,7 +1,6 @@
 public static class Helpers {
     /// <summary>
-    /// Convert a value greater than the max of a set to a value within range
-    /// <para>
+    /// Convert a value greater than the max of a set to a value within range.
     /// [0..3], input 4, result is 0
     /// </summary>
     /// <param name="input">int to wrap</param>

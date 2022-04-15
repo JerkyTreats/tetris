@@ -2,43 +2,43 @@ using UnityEngine;
 
 public class ActivePiece : MonoBehaviour
 {
-    public Board board { get; private set; }
-    public TetrominoData data { get; private set; }
+    public Board Board { get; private set; }
+    public TetrominoData Data { get; private set; }
 
-    public Vector3Int position { get; private set; }
-    public Vector3Int[] cells { get; private set; }
-    public int rotationIndex { get; private set; }
+    public Vector3Int Position { get; private set; }
+    public Vector3Int[] Cells { get; private set; }
+    public int RotationIndex { get; private set; }
 
     public float stepDelay = 1f;
     public float lockDelay = 0.5f;
 
-    private float stepTime;
-    private float lockTime;
-    private bool IsInitialized = false;
+    private float _stepTime;
+    private float _lockTime;
+    private bool _isInitialized = false;
 
     public void Initialize(Vector3Int spawnPosition, TetrominoData data, Board board) {
-        this.board = board;
-        this.data = data;
-        this.position = spawnPosition;
-        this.rotationIndex = 0;
-        this.stepTime = Time.time + this.stepDelay;
-        this.lockTime = 0f;
+        Board = board;
+        Data = data;
+        Position = spawnPosition;
+        RotationIndex = 0;
+        _stepTime = Time.time + stepDelay;
+        _lockTime = 0f;
 
-        if (this.cells == null)
-            this.cells = new Vector3Int[data.cells.Length];
+        if (Cells == null)
+            Cells = new Vector3Int[data.Cells.Length];
 
-        for (int i = 0; i < data.cells.Length; i++) {
-            this.cells[i] = (Vector3Int)data.cells[i];
+        for (var i = 0; i < data.Cells.Length; i++) {
+            Cells[i] = (Vector3Int)data.Cells[i];
         }
 
-        this.IsInitialized = true;
+        _isInitialized = true;
     }
 
     public void Update() {
-        if (IsInitialized) {
-            this.board.Clear(this);
+        if (_isInitialized) {
+            Board.Clear(this);
 
-            this.lockTime += Time.deltaTime;
+            _lockTime += Time.deltaTime;
 
             if (Input.GetKeyDown(KeyCode.Q)) {
             Rotate(-1);
@@ -62,28 +62,28 @@ public class ActivePiece : MonoBehaviour
             HardDrop();
             }
 
-            if (Time.time >= this.stepTime) {
+            if (Time.time >= _stepTime) {
                 Step();
             }
 
-            this.board.Set(this);
+            Board.Set(this);
         }
     }
 
     private void Step() {
-        this.stepTime = Time.time + this.stepDelay;
+        _stepTime = Time.time + stepDelay;
 
         Move(Vector2Int.down);
 
-        if (this.lockTime >= this.lockDelay) {
+        if (_lockTime >= lockDelay) {
             Lock();
         }
     }
 
     private void Lock() {
-        this.board.Set(this);
-        this.board.CheckClearedLines();
-        this.board.SpawnPiece();
+        Board.Set(this);
+        Board.CheckClearedLines();
+        Board.SpawnPiece();
     }
 
     public void HardDrop() {
@@ -94,14 +94,14 @@ public class ActivePiece : MonoBehaviour
 
 
     public bool Move(Vector2Int translation) {
-        Vector3Int newPosition = this.position;
+        var newPosition = Position;
         newPosition.x += translation.x;
         newPosition.y += translation.y;
-        bool valid = this.board.IsValidPosition(this, newPosition);
+        var valid = Board.IsValidPosition(this, newPosition);
 
         if ( valid ) {
-            this.position = newPosition;
-            this.lockTime = 0f;
+            Position = newPosition;
+            _lockTime = 0f;
         }
 
         return valid;
@@ -114,16 +114,16 @@ public class ActivePiece : MonoBehaviour
   /// </summary>
   /// <param name="direction">Represents index to move to. -1 or 1 expected</param>
     public void Rotate(int direction) {
-      int originRotation = rotationIndex;
-      rotationIndex = Helpers.Wrap(this.rotationIndex + direction, 0, 4);
+      var originRotation = RotationIndex;
+      RotationIndex = Helpers.Wrap(RotationIndex + direction, 0, 4);
 
       // Rotate the piece
       ApplyRotationMatrix(direction);
 
       // Test if rotation would put piece out of bounds
       // Revert if tests failed
-      if (!TestWallKicks(this.rotationIndex, direction)) {
-            this.rotationIndex = originRotation;
+      if (!TestWallKicks(RotationIndex, direction)) {
+            RotationIndex = originRotation;
             ApplyRotationMatrix(-direction);
         }
     }
@@ -135,25 +135,25 @@ public class ActivePiece : MonoBehaviour
     /// </summary>
     /// <param name="direction">Represents index to move to. -1 or 1 expected</param>
     private void ApplyRotationMatrix(int direction) {
-      for (int i = 0; i < this.cells.Length; i++) {
-        Vector3 cell = this.cells[i];
+      for (var i = 0; i < Cells.Length; i++) {
+        Vector3 cell = Cells[i];
         int x, y;
 
-        switch(this.data.tetromino) {
+        switch(Data.tetromino) {
           case Tetromino.I:
           case Tetromino.O:
             cell.x -= 0.5f;
             cell.y -= 0.5f;
-            x = Mathf.CeilToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y * Data.RotationMatrix[1] * direction));
-            y = Mathf.CeilToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
+            x = Mathf.CeilToInt((cell.x * global::Data.RotationMatrix[0] * direction) + (cell.y * global::Data.RotationMatrix[1] * direction));
+            y = Mathf.CeilToInt((cell.x * global::Data.RotationMatrix[2] * direction) + (cell.y * global::Data.RotationMatrix[3] * direction));
             break;
           default:
-            x = Mathf.RoundToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y * Data.RotationMatrix[1] * direction));
-            y = Mathf.RoundToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
+            x = Mathf.RoundToInt((cell.x * global::Data.RotationMatrix[0] * direction) + (cell.y * global::Data.RotationMatrix[1] * direction));
+            y = Mathf.RoundToInt((cell.x * global::Data.RotationMatrix[2] * direction) + (cell.y * global::Data.RotationMatrix[3] * direction));
             break;
         }
 
-        this.cells[i] = new Vector3Int(x, y, 0);
+        Cells[i] = new Vector3Int(x, y, 0);
       }
     }
 
@@ -164,10 +164,10 @@ public class ActivePiece : MonoBehaviour
     /// <param name="rotationDirection"></param>
     /// <returns></returns>
     private bool TestWallKicks(int rotationIndex, int rotationDirection) {
-        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
+        var wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
 
-        for (int i = 0; i < this.data.wallKicks.GetLength(1); i++){
-            Vector2Int translation = this.data.wallKicks[wallKickIndex, i];
+        for (var i = 0; i < Data.WallKicks.GetLength(1); i++){
+            var translation = Data.WallKicks[wallKickIndex, i];
 
             if (Move(translation)){
                 return true;
@@ -178,12 +178,12 @@ public class ActivePiece : MonoBehaviour
     }
 
     private int GetWallKickIndex(int rotationIndex, int rotationDirection) {
-        int wallKickIndex = rotationIndex * 2;
+        var wallKickIndex = rotationIndex * 2;
 
         if (rotationDirection < 0){
             wallKickIndex--;
         }
 
-        return Helpers.Wrap(wallKickIndex, 0, this.data.wallKicks.GetLength(0));
+        return Helpers.Wrap(wallKickIndex, 0, Data.WallKicks.GetLength(0));
     }
 }

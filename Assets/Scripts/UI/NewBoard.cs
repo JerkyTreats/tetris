@@ -26,7 +26,7 @@ public class NewBoard : MonoBehaviour
 
     void TaskOnClick()
     {
-        Board board = Board.Initialize(board1);
+        var board = BoardFactory.CreateNewBoard(board1);
         board.boardCamera.ActivateCamera();
     }
 }
