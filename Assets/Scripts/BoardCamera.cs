@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class BoardCamera
@@ -21,6 +22,11 @@ public class BoardCamera
         _camera = _boardCamera.GetComponentInChildren<Camera>();
         _camera.orthographic = true;
         _camera.orthographicSize = 12.00f;
+        
+        // TODO : Pull magic number into static variable, probably in gameData or something
+        _camera.clearFlags = CameraClearFlags.SolidColor;
+        var color = Helpers.HexStringToColor("171B1F");
+        _camera.backgroundColor = color;
     }
     
     /// <summary>
@@ -30,7 +36,7 @@ public class BoardCamera
         _boardCamera.tag = "MainCamera"; // sets Camera.main property
         _boardCamera.SetActive(true);
         _camera.enabled = true;
-        // this.camera.enabled
+
     }
 
     public void DeactivateCamera() {

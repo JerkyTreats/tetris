@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class Helpers {
     /// <summary>
     /// Convert a value greater than the max of a set to a value within range.
@@ -13,5 +15,14 @@ public static class Helpers {
       } else {
         return min + (input - min) % (max - min);
       }
+    }
+    
+    public static Color32 HexStringToColor(string hexString)
+    {
+      var hex = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+      var r = (byte)((hex >> 16) & 0xFF);
+      var g = (byte)((hex >> 8) & 0xFF);
+      var b = (byte)((hex) & 0xFF);
+      return new Color32(r, g, b, 255);
     }
 }
