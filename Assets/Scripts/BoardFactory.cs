@@ -11,7 +11,7 @@ public static class BoardFactory
         board.boardSize = boardSize;
         board.boardCamera = new BoardCamera(board.gameObject, cameraPosition);
 
-        board.tetrisGameLogic = TetrisGameLogic.CreateNewGameLogic(board, spawnPosition);
+        board.gameController = GameController.CreateNewGameLogic(board, spawnPosition);
 
         Border.CreateBoardBorder(board);
         BoardBackground.CreateBoardBackground(board);

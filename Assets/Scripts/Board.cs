@@ -8,7 +8,7 @@ public class Board : MonoBehaviour
 
     public GameData GameData { get; private set; }
     public BoardCamera boardCamera;
-    public TetrisGameLogic tetrisGameLogic;
+    public GameController gameController;
 
     public Tilemap Tilemap { get; private set; }
 
@@ -66,12 +66,12 @@ public class Board : MonoBehaviour
 
     public void OnActivate() {
         boardCamera.ActivateCamera();
-        tetrisGameLogic.OnActivate();
+        gameController.OnActivate();
     }
 
     public void OnDeactivate() {
         boardCamera.DeactivateCamera();
-        tetrisGameLogic.OnDeactivate();
+        gameController.OnDeactivate();
         Tilemap.ClearAllTiles();
     }
 

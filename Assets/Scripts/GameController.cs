@@ -2,7 +2,19 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class TetrisGameLogic : MonoBehaviour
+// Controls the gameplay of Tetris 
+// Where Board is the visual manifestation of the components of Tetris,
+// And ActivePiece, Ghost, etc. control each individual component,
+// This controls how the game operates- beginning, while active, and end.
+
+// Short term - give Active Piece back its control. 
+// Next - Implement Observer/Observable 
+//          - GameController runs PreStep() 
+//          - GameController issues Step() 
+//          - Ghost/ActivePiece onStep()
+//          - Ghost/ActivePiece announce() stepResults
+//          - GameController runs PostStep()
+public class GameController : MonoBehaviour
 {
     private Board _board;
     private GameData _gameData;
@@ -20,9 +32,9 @@ public class TetrisGameLogic : MonoBehaviour
     private ActivePiece ActivePiece { get; set; }
     private GhostPiece GhostPiece { get; set; }
 
-    public static TetrisGameLogic CreateNewGameLogic(Board board, Vector3Int spawnPosition, float stepDelay = 1f, float lockDelay = 0.5f)
+    public static GameController CreateNewGameLogic(Board board, Vector3Int spawnPosition, float stepDelay = 1f, float lockDelay = 0.5f)
     {
-        var gameLogic = board.AddComponent<TetrisGameLogic>();
+        var gameLogic = board.AddComponent<GameController>();
         gameLogic._board = board;
         gameLogic._spawnPosition = spawnPosition;
         gameLogic._gameData = board.GameData;
@@ -31,6 +43,17 @@ public class TetrisGameLogic : MonoBehaviour
         gameLogic._lockTime = 0f;
 
         return gameLogic;
+    }
+    
+    public void OnActivate()
+    {
+        SpawnPiece();
+    }
+    
+    public void OnDeactivate()
+    {
+        Destroy(GhostPiece.gameObject);
+        Destroy(ActivePiece.gameObject);
     }
 
     public void Update()
@@ -69,17 +92,6 @@ public class TetrisGameLogic : MonoBehaviour
         }
 
         _board.Set(ActivePiece);
-    }
-
-    public void OnActivate()
-    {
-        SpawnPiece();
-    }
-
-    public void OnDeactivate()
-    {
-        Destroy(GhostPiece.gameObject);
-        Destroy(ActivePiece.gameObject);
     }
 
     /// <summary>
