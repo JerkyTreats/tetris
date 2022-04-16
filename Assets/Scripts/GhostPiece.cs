@@ -13,30 +13,20 @@ public class GhostPiece : MonoBehaviour
     private Vector3Int[] Cells { get; set; }
     private Vector3Int Position { get; set; }
 
-    private bool _isInitialized = false;
-
     /// <summary>
-    /// Create the Ghost Piece gameobject and initialize
+    /// Create the Ghost Piece GameObject and initialize
     /// </summary>
-    public static void Initialize(Board board) {
-        var ghostObject = new GameObject("Ghost")
-        {
-            transform =
-            {
-                parent = board.transform
-            }
-        };
-        ghostObject.AddComponent<Tilemap>();
-        var renderer = ghostObject.AddComponent<TilemapRenderer>();
-        renderer.sortingOrder = 1;
+    public static GhostPiece CreateNewGhostPiece(Board board, ActivePiece activePiece, Tile tile)
+    {
+        var ghostObject = TileGameObjectFactory.CreateNewTileObject("Ghost", Vector3Int.zero, 1, board.transform);
 
         var ghostPiece = ghostObject.AddComponent<GhostPiece>();
         ghostPiece.board = board;
-        ghostPiece.TrackingPiece = board.ActivePiece;
-        ghostPiece.transform.position = ghostPiece.TrackingPiece.transform.position;
-        ghostPiece.tile = board.GameData.ghostTile;
+        ghostPiece.TrackingPiece = activePiece;
+        ghostPiece.transform.localPosition = Vector3.zero;
+        ghostPiece.tile = tile;
 
-        ghostPiece._isInitialized = true;
+        return ghostPiece;
     }
 
     public void Awake() {
@@ -47,7 +37,6 @@ public class GhostPiece : MonoBehaviour
     // Do late update to track when the real piece moves
     private void LateUpdate()
     {
-        if (!_isInitialized) return;
         Clear();
         Copy();
         Drop();
@@ -80,14 +69,13 @@ public class GhostPiece : MonoBehaviour
     /// </summary>
     private void Drop() {
         var bounds = board.WorldBounds;
-        var row = TrackingPiece.Position.y - 1;
+        var row = TrackingPiece.position.y - 1;
 
-        // Wrap logic in Clear/Set as IsValidPosition will be false
-        // As Ghost will be in same position as tracking piece
+        // Wrap logic in Clear/Set as IsValidPosition will be false as Ghost will be in same position as tracking piece
         board.Clear(TrackingPiece);
 
         while ( row >= bounds.yMin - 1 ) {
-            var pos = TrackingPiece.Position;
+            var pos = TrackingPiece.position;
             pos.y = row;
 
             if(board.IsValidPosition(TrackingPiece, pos)) {

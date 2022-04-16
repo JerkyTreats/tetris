@@ -93,7 +93,7 @@ public class BoardManager : MonoBehaviour
         Populate();
         // Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
         // b.ActivateGameOnBoard();
-        boardObjects[currentBoard].ActivateGame();
+        boardObjects[currentBoard].OnActivate();
         InvokeRepeating("SwitchBoard", 2.0f, 212.0f);
     }
 
@@ -101,9 +101,9 @@ public class BoardManager : MonoBehaviour
     /// Cycle through each board and see what happens
     /// </summary>
     void SwitchBoard(){
-        boardObjects[currentBoard].DeactivateGame();
+        boardObjects[currentBoard].OnDeactivate();
         currentBoard = Helpers.Wrap(currentBoard + 1, 0, boardObjects.Count);
-        boardObjects[currentBoard].ActivateGame();
+        boardObjects[currentBoard].OnActivate();
 
     }
 }

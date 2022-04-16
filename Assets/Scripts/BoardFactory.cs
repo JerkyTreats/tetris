@@ -8,9 +8,10 @@ public static class BoardFactory
 
         var board = boardGo.AddComponent<Board>();
         board.boardPosition = boardPosition;
-        board.spawnPosition = spawnPosition;
         board.boardSize = boardSize;
         board.boardCamera = new BoardCamera(board.gameObject, cameraPosition);
+
+        board.tetrisGameLogic = TetrisGameLogic.CreateNewGameLogic(board, spawnPosition);
 
         Border.CreateBoardBorder(board);
         BoardBackground.CreateBoardBackground(board);

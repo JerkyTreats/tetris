@@ -62,18 +62,18 @@ public class PersistentDataManager {
 
 
 
-    private void SaveBoard(Board board) {
-        var fileName = GetNewSaveFileName();
-
-        using var file = File.OpenWrite(fileName);
-
-        var data = new BoardData
-        {
-            spawnPosition = board.spawnPosition,
-            boardSize = board.boardSize,
-            // tiles = board.placedBlocks
-        };
-
-        Serializer.Serialize(file, data);
-    }
+    // private void SaveBoard(Board board) {
+    //     var fileName = GetNewSaveFileName();
+    //
+    //     using var file = File.OpenWrite(fileName);
+    //
+    //     var data = new BoardData
+    //     {
+    //         spawnPosition = board.spawnPosition,
+    //         boardSize = board.boardSize,
+    //         // tiles = board.placedBlocks
+    //     };
+    //
+    //     Serializer.Serialize(file, data);
+    // }
 }
