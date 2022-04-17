@@ -109,7 +109,7 @@ public class GameController : MonoBehaviour
         }
 
         // False if there is a piece colliding in spawn position.
-        if (_board.IsValidPosition(ActivePiece, _spawnPosition)) {
+        if (_board.IsValidPiecePosition(ActivePiece, _spawnPosition)) {
             _board.Set(ActivePiece);
         } else {
             GameOver();
@@ -160,7 +160,7 @@ public class GameController : MonoBehaviour
         var newPosition = ActivePiece.position;
         newPosition.x += translation.x;
         newPosition.y += translation.y;
-        var valid = _board.IsValidPosition(ActivePiece, newPosition);
+        var valid = _board.IsValidPiecePosition(ActivePiece, newPosition);
 
         if (!valid) return false;
         

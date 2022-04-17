@@ -78,7 +78,7 @@ public class GhostPiece : MonoBehaviour
             var pos = TrackingPiece.position;
             pos.y = row;
 
-            if(board.IsValidPosition(TrackingPiece, pos)) {
+            if(board.IsValidPiecePosition(TrackingPiece, pos)) {
                 row--;
             } else {
                 pos.y = row + 1;

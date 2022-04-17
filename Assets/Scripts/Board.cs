@@ -107,21 +107,25 @@ public class Board : MonoBehaviour
     /// <param name="piece"></param>
     /// <param name="newPosition"></param>
     /// <returns>bool</returns>
-    public bool IsValidPosition(ActivePiece piece, Vector3Int newPosition)
+    public bool IsValidPiecePosition(ActivePiece piece, Vector3Int newPosition)
     {
         // Loop through each tile in the Tetromino
         foreach (var tilePosition in piece.Cells)
         {
             var newTilePosition = tilePosition + newPosition;
-
-            if (!TileBounds.Contains((Vector2Int)newTilePosition)) {
-                return false;
-            }
-
-            if (Tilemap.HasTile(newTilePosition)) {
-                return false;
-            }
+            if (!IsValidPosition(newTilePosition)) return false;
         }
+
+        return true;
+    }
+
+    public bool IsValidPosition(Vector3Int position)
+    {
+        if (!TileBounds.Contains((Vector2Int)position)) 
+            return false;
+
+        if (Tilemap.HasTile(position))
+            return false;
 
         return true;
     }
