@@ -1,3 +1,4 @@
+using Common;
 using Tetris;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -6,8 +7,15 @@ namespace Board
 {
     public class Board : MonoBehaviour
     {
-        public Vector2Int boardSize;
-        public Vector3Int boardPosition;
+        #region Properties
+
+        private BoardData _data;
+
+        public Vector3Int BoardPosition => _data.boardPosition;
+
+        // Will likely be using these in the future but YAGNI for the moment
+        public Border border;
+        public BoardBackground background;
 
         public GameData GameData { get; private set; }
         public BoardCamera boardCamera;
@@ -18,61 +26,86 @@ namespace Board
         /// <summary>
         /// Rectangle representing the board in WorldSpace
         /// </summary>
-        public RectInt WorldBounds {
-            get {
+        public RectInt WorldBounds
+        {
+            get
+            {
                 // Origin is middle of rect, position is bottom left
                 var position = new Vector2Int(
-                    boardPosition.x - boardSize.x / 2,
-                    boardPosition.y - boardSize.y / 2
+                    _data.boardPosition.x - _data.boardSize.x / 2,
+                    _data.boardPosition.y - _data.boardSize.y / 2
                 );
 
-                return new RectInt(position, boardSize);
+                return new RectInt(position, _data.boardSize);
             }
         }
 
         /// <summary>
         /// Rectangle representing the board in TileSpace (Origin is always 0,0)
         /// </summary>
-        public RectInt TileBounds {
-            get {
+        public RectInt TileBounds
+        {
+            get
+            {
                 var bottomLeft = new Vector2Int(
-                    -boardSize.x / 2,
-                    -boardSize.y / 2
+                    -_data.boardSize.x / 2,
+                    -_data.boardSize.y / 2
                 );
 
-                return new RectInt(bottomLeft, boardSize);
+                return new RectInt(bottomLeft, _data.boardSize);
             }
         }
+        
+        #endregion
+
+        #region Initialization
 
         /// <summary>
-        /// EDITOR: Draw the WorldBounds so inspect while game is paused
+        /// Create a new Board GameObject with configured components
         /// </summary>
-        void OnDrawGizmosSelected()
+        /// <param name="boardData"></param>
+        /// <returns></returns>
+        public static Board CreateNewBoard(BoardData boardData)
         {
-            // Draw a yellow cube at the transform position
-            Gizmos.color = Color.yellow;
-            // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
-            Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+            var boardGo =
+                TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
+            var board = boardGo.AddComponent<Board>();
+            board._data = boardData;
+            board.boardCamera = new BoardCamera(board.gameObject, boardData.cameraPosition);
+
+            board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
+
+            return board;
         }
 
-        private void Awake() {
+        private void Awake()
+        {
             Tilemap = GetComponentInChildren<Tilemap>();
 
             var gameDataObject = GameObject.Find("GameData");
             GameData = gameDataObject.GetComponent<GameData>();
 
+            border = Border.CreateBoardBorder(this);
+            background = BoardBackground.CreateBoardBackground(this);
+
             // Initialize each Tetromino listed in Editor object
-            for (var i = 0;  i < GameData.tetrominos.Length; i++) {
+            for (var i = 0; i < GameData.tetrominos.Length; i++)
+            {
                 GameData.tetrominos[i].Initialize();
             }
         }
 
-        public void OnActivate() {
+        #endregion
+        
+        // TODO These two functions should probably be an interface for all Activatable objects
+        public void OnActivate()
+        {
             boardCamera.ActivateCamera();
             gameController.OnActivate();
         }
 
-        public void OnDeactivate() {
+        public void OnDeactivate()
+        {
             boardCamera.DeactivateCamera();
             gameController.OnDeactivate();
             Tilemap.ClearAllTiles();
@@ -122,15 +155,31 @@ namespace Board
             return true;
         }
 
+        /// <summary>
+        /// Determines if the input position is within the bounds of the Board size.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool IsValidPosition(Vector3Int position)
         {
-            if (!TileBounds.Contains((Vector2Int)position)) 
+            if (!TileBounds.Contains((Vector2Int) position))
                 return false;
 
             if (Tilemap.HasTile(position))
                 return false;
 
             return true;
+        }
+        
+        
+        // EDITOR: Draw the WorldBounds to inspect while game is paused
+        // TODO Disable on real builds? 
+        private void OnDrawGizmosSelected()
+        {
+            // Draw a yellow cube at the transform position
+            Gizmos.color = Color.yellow;
+            // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+            Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
         }
     }
 }
