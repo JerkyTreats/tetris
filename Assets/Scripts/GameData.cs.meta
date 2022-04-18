@@ -3,7 +3,9 @@ guid: dfdf2dc3629f1464cbfc58c56dbda6d1
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - ghostTile: {fileID: 11400000, guid: 5fa1db57fcd2141c783f05333b3fac99, type: 2}
+  - gridTile: {fileID: 11400000, guid: 2b9d3576f941047909ea2a3c0f592bbf, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public static class Helpers {
+namespace Common
+{
+  public static class Helpers {
     /// <summary>
     /// Convert a value greater than the max of a set to a value within range.
     /// [0..3], input 4, result is 0
@@ -25,4 +27,5 @@ public static class Helpers {
       var b = (byte)((hex) & 0xFF);
       return new Color32(r, g, b, 255);
     }
+  }
 }
