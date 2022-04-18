@@ -28,7 +28,7 @@ namespace Board
 
             var boards = new List<BoardData>();
             boards.Add(board1);
-            var b = BoardFactory.CreateNewBoard(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
+            var b = Board.CreateNewBoard(board1);
             boardObjects.Add(b);
 
             // List<BoardTileData> board2Tiles = new List<BoardTileData>();
@@ -47,7 +47,7 @@ namespace Board
             for (var i = 0; i < 2; i++) {
                 var nextBoard = GetNextBoard(boards[boards.Count-1]);
                 boards.Add(nextBoard);
-                b = BoardFactory.CreateNewBoard(nextBoard.spawnPosition, nextBoard.cameraPosition, nextBoard.boardPosition, nextBoard.boardSize, 2);
+                b = Board.CreateNewBoard(nextBoard);
                 boardObjects.Add(b);
             }
         }

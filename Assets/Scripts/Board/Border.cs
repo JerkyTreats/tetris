@@ -14,7 +14,7 @@ namespace Board
         /// <summary>
         /// Create the Border GameObject and initialize
         /// </summary>
-        public static GameObject CreateBoardBorder(Board board)
+        public static Border CreateBoardBorder(Board board)
         {
             var borderObject = TileGameObjectFactory.CreateNewTileObject("Border", Vector3Int.zero, 0, board.transform);
         
@@ -23,7 +23,7 @@ namespace Board
             border.borderPieces = board.GameData.borderPieces;
             border.DrawBorder();
 
-            return borderObject;
+            return border;
         }
 
         private void Awake() {

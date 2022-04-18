@@ -13,22 +13,22 @@ namespace Board
         /// <summary>
         /// Create the BoardBackground GameObject and initialize
         /// </summary>
-        public static GameObject CreateBoardBackground(Board board)
+        public static BoardBackground CreateBoardBackground(Board board)
         {
             var backgroundObject = TileGameObjectFactory.CreateNewTileObject("BoardBackground", Vector3Int.zero, 0, board.transform);
             var boardBackground = backgroundObject.AddComponent<BoardBackground>();
             boardBackground.board = board;
             boardBackground.gridTile = board.GameData.gridTile;
 
-            return backgroundObject;
+            return boardBackground;
         }
 
 
-        public void Awake() {
+        private void Awake() {
             TileMap = GetComponentInChildren<Tilemap>();
         }
 
-        public void Start() {
+        private void Start() {
             DrawGrid();
         }
 

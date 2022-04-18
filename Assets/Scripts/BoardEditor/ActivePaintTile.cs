@@ -44,7 +44,7 @@ namespace BoardEditor
             
             // Screen space to camera space
             var worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            worldPos.z = board.boardPosition.z;
+            worldPos.z = board.BoardPosition.z;
             
             // Camera space to tilemap coord
             var tilePosition = TileMap.WorldToCell(worldPos);
