@@ -24,9 +24,9 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     void Populate() {
 
-        List<BoardData> boards = new List<BoardData>();
+        var boards = new List<BoardData>();
         boards.Add(board1);
-        Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
+        var b = BoardFactory.CreateNewBoard(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
         boardObjects.Add(b);
 
         // List<BoardTileData> board2Tiles = new List<BoardTileData>();
@@ -42,10 +42,10 @@ public class BoardManager : MonoBehaviour
         //     tiles = board2Tiles
         // };
 
-        for (int i = 0; i < 2; i++) {
-            BoardData nextBoard = GetNextBoard(boards[boards.Count-1]);
+        for (var i = 0; i < 2; i++) {
+            var nextBoard = GetNextBoard(boards[boards.Count-1]);
             boards.Add(nextBoard);
-            b = Board.Initialize(nextBoard.spawnPosition, nextBoard.cameraPosition, nextBoard.boardPosition, nextBoard.boardSize, 2);
+            b = BoardFactory.CreateNewBoard(nextBoard.spawnPosition, nextBoard.cameraPosition, nextBoard.boardPosition, nextBoard.boardSize, 2);
             boardObjects.Add(b);
         }
     }
@@ -56,25 +56,25 @@ public class BoardManager : MonoBehaviour
     /// <param name="previousBoard"></param>
     /// <returns></returns>
     BoardData GetNextBoard(BoardData previousBoard) {
-        Vector2Int nextBoardSize = new Vector2Int((Random.Range(5, 10) * 2), (Random.Range(5, 10) * 2));
-        int nextBoardSizeXOrigin = nextBoardSize.x / 2;
-        int buffer = 1;
-        int previousBoardXOrigin = previousBoard.boardPosition.x + (previousBoard.boardSize.x / 2);
-        int nextX = previousBoardXOrigin + buffer + nextBoardSizeXOrigin;
+        var nextBoardSize = new Vector2Int((Random.Range(5, 10) * 2), (Random.Range(5, 10) * 2));
+        var nextBoardSizeXOrigin = nextBoardSize.x / 2;
+        var buffer = 1;
+        var previousBoardXOrigin = previousBoard.boardPosition.x + (previousBoard.boardSize.x / 2);
+        var nextX = previousBoardXOrigin + buffer + nextBoardSizeXOrigin;
 
-        Vector3Int nextBoardPos = new Vector3Int(
+        var nextBoardPos = new Vector3Int(
             nextX,
             0,
             0
         );
 
-        Vector3Int nextSpawn = new Vector3Int(
+        var nextSpawn = new Vector3Int(
             - 1,
             (nextBoardSize.y / 2) - 3,
             0
         );
 
-        Vector3Int nextCam = new Vector3Int(
+        var nextCam = new Vector3Int(
             nextX,
             previousBoard.boardPosition.y,
             -10
@@ -93,7 +93,7 @@ public class BoardManager : MonoBehaviour
         Populate();
         // Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
         // b.ActivateGameOnBoard();
-        boardObjects[currentBoard].ActivateGameOnBoard();
+        boardObjects[currentBoard].OnActivate();
         InvokeRepeating("SwitchBoard", 2.0f, 212.0f);
     }
 
@@ -101,9 +101,9 @@ public class BoardManager : MonoBehaviour
     /// Cycle through each board and see what happens
     /// </summary>
     void SwitchBoard(){
-        boardObjects[currentBoard].DeactivateGame();
+        boardObjects[currentBoard].OnDeactivate();
         currentBoard = Helpers.Wrap(currentBoard + 1, 0, boardObjects.Count);
-        boardObjects[currentBoard].ActivateGameOnBoard();
+        boardObjects[currentBoard].OnActivate();
 
     }
 }

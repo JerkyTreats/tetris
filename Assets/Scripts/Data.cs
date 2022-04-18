@@ -6,9 +6,9 @@ using UnityEngine;
 /// </summary>
 public static class Data
 {
-    public static readonly float cos = Mathf.Cos(Mathf.PI / 2f);
-    public static readonly float sin = Mathf.Sin(Mathf.PI / 2f);
-    public static readonly float[] RotationMatrix = new float[] { cos, sin, -sin, cos };
+    public static readonly float Cos = Mathf.Cos(Mathf.PI / 2f);
+    public static readonly float Sin = Mathf.Sin(Mathf.PI / 2f);
+    public static readonly float[] RotationMatrix = new float[] { Cos, Sin, -Sin, Cos };
 
     /// <summary>
     /// Dictionary of Tetromino's, manually expressing each 4-block combination by vector.
@@ -26,10 +26,8 @@ public static class Data
 
     /// <summary>
     /// A wallkick occurs when rotating a Tetromino against the side wall. By default, the tetromino will clip through the boundary.
-    /// <para>
     /// There are several tests to perform that will prevent a Wallkick. These are well published here: https://tetris.fandom.com/wiki/SRS
-    /// <para>
-    /// Unfortuantely, 'I' piece has different tests from the other Tetrominos.
+    /// Unfortunately, 'I' piece has different tests from the other Tetrominos.
     /// </summary>
     private static readonly Vector2Int[,] WallKicksI = new Vector2Int[,] {
         { new Vector2Int(0, 0), new Vector2Int(-2, 0), new Vector2Int( 1, 0), new Vector2Int(-2,-1), new Vector2Int( 1, 2) },
@@ -44,12 +42,9 @@ public static class Data
 
     /// <summary>
     /// A wallkick occurs when rotating a Tetromino against the side wall. By default, the tetromino will clip through the boundary.
-    /// <para>
     /// There are several tests to perform that will prevent a Wallkick. These are well published here: https://tetris.fandom.com/wiki/SRS
-    /// <para>
-    /// Unfortuantely, 'I' piece has different tests from the other Tetrominos.
     /// </summary>
-    private static readonly Vector2Int[,] WallKicksJLOSTZ = new Vector2Int[,] {
+    private static readonly Vector2Int[,] WallKicksJlostz = new Vector2Int[,] {
         { new Vector2Int(0, 0), new Vector2Int(-1, 0), new Vector2Int(-1, 1), new Vector2Int(0,-2), new Vector2Int(-1,-2) },
         { new Vector2Int(0, 0), new Vector2Int( 1, 0), new Vector2Int( 1,-1), new Vector2Int(0, 2), new Vector2Int( 1, 2) },
         { new Vector2Int(0, 0), new Vector2Int( 1, 0), new Vector2Int( 1,-1), new Vector2Int(0, 2), new Vector2Int( 1, 2) },
@@ -66,12 +61,12 @@ public static class Data
     public static readonly Dictionary<Tetromino, Vector2Int[,]> WallKicks = new Dictionary<Tetromino, Vector2Int[,]>()
     {
         { Tetromino.I, WallKicksI },
-        { Tetromino.J, WallKicksJLOSTZ },
-        { Tetromino.L, WallKicksJLOSTZ },
-        { Tetromino.O, WallKicksJLOSTZ },
-        { Tetromino.S, WallKicksJLOSTZ },
-        { Tetromino.T, WallKicksJLOSTZ },
-        { Tetromino.Z, WallKicksJLOSTZ },
+        { Tetromino.J, WallKicksJlostz },
+        { Tetromino.L, WallKicksJlostz },
+        { Tetromino.O, WallKicksJlostz },
+        { Tetromino.S, WallKicksJlostz },
+        { Tetromino.T, WallKicksJlostz },
+        { Tetromino.Z, WallKicksJlostz },
     };
 
 }
