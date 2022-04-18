@@ -7,7 +7,7 @@ namespace BoardEditor
     {
         private Tile Tile { get; set; }
         private Tilemap TileMap { get; set; }
-        public Board board;
+        public Board.Board board;
 
         /// <summary>
         /// Create ActivePainter GameObject with setup components
@@ -24,7 +24,7 @@ namespace BoardEditor
         
         private void Start()
         {
-            board = FindObjectOfType<Board>();
+            board = FindObjectOfType<Board.Board>();
         }
 
         private void Update()
