@@ -11,9 +11,9 @@ namespace Board
     {
         #region Properties
 
-        private BoardData _data;
+        public BoardData data;
 
-        public Vector3Int BoardPosition => _data.boardPosition;
+        public Vector3Int BoardPosition => data.boardPosition;
 
         // Will likely be using these in the future but YAGNI for the moment
         public Border border;
@@ -34,11 +34,11 @@ namespace Board
             {
                 // Origin is middle of rect, position is bottom left
                 var position = new Vector2Int(
-                    _data.boardPosition.x - _data.boardSize.x / 2,
-                    _data.boardPosition.y - _data.boardSize.y / 2
+                    data.boardPosition.x - data.boardSize.x / 2,
+                    data.boardPosition.y - data.boardSize.y / 2
                 );
 
-                return new RectInt(position, _data.boardSize);
+                return new RectInt(position, data.boardSize);
             }
         }
 
@@ -50,11 +50,11 @@ namespace Board
             get
             {
                 var bottomLeft = new Vector2Int(
-                    -_data.boardSize.x / 2,
-                    -_data.boardSize.y / 2
+                    -data.boardSize.x / 2,
+                    -data.boardSize.y / 2
                 );
 
-                return new RectInt(bottomLeft, _data.boardSize);
+                return new RectInt(bottomLeft, data.boardSize);
             }
         }
         
@@ -72,7 +72,7 @@ namespace Board
             var boardGo =
                 TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
             var board = boardGo.AddComponent<Board>();
-            board._data = boardData;
+            board.data = boardData;
             board.boardCamera = new BoardCamera(board.gameObject, boardData.cameraPosition);
 
             board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
@@ -186,7 +186,7 @@ namespace Board
         // TODO - I'm not sure I love this. This sets blocks, but Tetrominos are sets of blocks... Overload? Separate GameEditorBoard?
         public void SetTile(Block block, Vector3Int tilePosition, Tile tile)
         {
-            _data.tiles.Add(new BoardTileData()
+            data.tiles.Add(new BoardTileData()
             {
                 block = block,
                 position = tilePosition

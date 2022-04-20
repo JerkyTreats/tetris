@@ -1,4 +1,3 @@
-using Board;
 using Board.Persistence;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +9,8 @@ namespace BoardEditor
     /// </summary>
     public class MenuButtonController : MonoBehaviour
     {
+        private Board.Board _board;
+        private BoardRepository _boardRepo;
         //Make sure to attach these Buttons in the Inspector
         public Button newBoardButton, saveBoardButton, loadBoardButton;
 
@@ -25,17 +26,22 @@ namespace BoardEditor
 
         private void Start()
         {
-            newBoardButton.onClick.AddListener(TaskOnClick);
+            newBoardButton.onClick.AddListener(CreateBoard);
+            saveBoardButton.onClick.AddListener(SaveBoard);
         }
 
-        private void TaskOnClick()
+        private void SaveBoard()
         {
-            BoardFactory.CreateNewBoard(board1);
+            if (!_boardRepo)
+                _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
+            
+            _boardRepo.Create(_board.data);
+            
         }
 
         private void CreateBoard()
         {
-            Board.Board.CreateNewBoard(board1);
+            _board = Board.Board.CreateNewBoard(board1);
         }
         
         
