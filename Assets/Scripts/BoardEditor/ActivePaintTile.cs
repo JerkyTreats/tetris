@@ -1,3 +1,4 @@
+using Board.Persistence;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,6 +8,8 @@ namespace BoardEditor
     {
         private Tile Tile { get; set; }
         private Tilemap TileMap { get; set; }
+        private Block block { get; set; } 
+        
         public Board.Board board;
 
         /// <summary>
@@ -14,12 +17,14 @@ namespace BoardEditor
         /// </summary>
         /// <param name="paintButton"></param>
         /// <param name="tilemap"></param>
-        public static void CreateNewActivePainter(PaintButton paintButton, Tilemap tilemap)
+        /// <param name="block"></param>
+        public static void CreateNewActivePainter(PaintButton paintButton, Tilemap tilemap, Block block)
         {
             var activePaintTileObject = new GameObject("ActivePainter");
             var activePaintTile = activePaintTileObject.AddComponent<ActivePaintTile>();
             activePaintTile.Tile = paintButton.tile;
             activePaintTile.TileMap = tilemap;
+            activePaintTile.block = block;
         }
         
         private void Start()
@@ -49,8 +54,8 @@ namespace BoardEditor
             // Camera space to tilemap coord
             var tilePosition = TileMap.WorldToCell(worldPos);
 
-            if (board.IsValidPosition(tilePosition)) 
-                TileMap.SetTile(tilePosition, Tile);
+            if (board.IsValidPosition(tilePosition))
+                board.SetTile(block, tilePosition, Tile);
         }
     }
 }

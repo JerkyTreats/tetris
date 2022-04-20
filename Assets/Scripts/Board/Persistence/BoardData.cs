@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using ProtoBuf;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-namespace Board
+namespace Board.Persistence
 {
     [ProtoContract]
     public struct BoardData {
@@ -20,6 +19,17 @@ namespace Board
         public int sortOrder;
         [ProtoMember(6)]
         public List<BoardTileData> tiles;
+
+        public BoardData(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder = 0, List<BoardTileData> tiles = null)
+        {
+            this.spawnPosition = spawnPosition;
+            this.cameraPosition  = cameraPosition;
+            this.boardPosition = boardPosition;
+            this.boardSize = boardSize;
+            this.sortOrder = sortOrder;
+
+            this.tiles = tiles ?? new List<BoardTileData>();
+        }
     }
 
     [ProtoContract]

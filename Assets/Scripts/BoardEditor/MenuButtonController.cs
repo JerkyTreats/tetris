@@ -1,4 +1,5 @@
 using Board;
+using Board.Persistence;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,15 +13,15 @@ namespace BoardEditor
         //Make sure to attach these Buttons in the Inspector
         public Button newBoardButton, saveBoardButton, loadBoardButton;
 
-        // TODO Serial to file nephew.
+        // TODO Serialize to file nephew.
         // Duplicated from BoardManager
-        public BoardData board1 = new BoardData {
-            spawnPosition = new Vector3Int(-1, 7, 0),
-            cameraPosition = new Vector3Int(0, 0, -10),
-            boardPosition = new Vector3Int(0, 0, 0),
-            boardSize = new Vector2Int(10,20),
-            sortOrder = 2,
-        };
+        public BoardData board1 = new BoardData(
+            new Vector3Int(-1, 7, 0),
+            new Vector3Int(0, 0, -10),
+            new Vector3Int(0, 0, 0),
+            new Vector2Int(10,20),
+            2
+        );
 
         private void Start()
         {
@@ -31,5 +32,12 @@ namespace BoardEditor
         {
             BoardFactory.CreateNewBoard(board1);
         }
+
+        private void CreateBoard()
+        {
+            Board.Board.CreateNewBoard(board1);
+        }
+        
+        
     }
 }

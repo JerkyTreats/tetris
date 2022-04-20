@@ -1,4 +1,5 @@
 using Common;
+using Initialization;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,10 +10,12 @@ namespace BoardEditor
     /// </summary>
     public class PaintController : MonoBehaviour
     {
+        private GameData _gameData;
         private Tilemap Tilemap { get; set; }
 
         private void Start()
         {
+            _gameData = Resources.Load<GameData>("GameData");
             // Register all paintbutton selection events 
             foreach (var paintButton in FindObjectsOfType<PaintButton>())
             {
@@ -26,7 +29,7 @@ namespace BoardEditor
         private void SelectTile(PaintButton paintButton)
         {
             ActivePainterCleanUp();
-            ActivePaintTile.CreateNewActivePainter(paintButton, Tilemap);
+            ActivePaintTile.CreateNewActivePainter(paintButton, Tilemap, _gameData.GetBlockFromTile(paintButton.tile));
         }
 
         // Seek and destroy all ActivePainter

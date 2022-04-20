@@ -1,4 +1,6 @@
+using Board.Persistence;
 using Common;
+using Initialization;
 using Tetris;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -82,8 +84,7 @@ namespace Board
         {
             Tilemap = GetComponentInChildren<Tilemap>();
 
-            var gameDataObject = GameObject.Find("GameData");
-            GameData = gameDataObject.GetComponent<GameData>();
+            GameData = Resources.Load<GameData>("GameData");
 
             border = Border.CreateBoardBorder(this);
             background = BoardBackground.CreateBoardBackground(this);
@@ -180,6 +181,19 @@ namespace Board
             Gizmos.color = Color.yellow;
             // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
             Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+        }
+
+        // TODO - I'm not sure I love this. This sets blocks, but Tetrominos are sets of blocks... Overload? Separate GameEditorBoard?
+        public void SetTile(Block block, Vector3Int tilePosition, Tile tile)
+        {
+            _data.tiles.Add(new BoardTileData()
+            {
+                block = block,
+                position = tilePosition
+            });
+            
+            
+            Tilemap.SetTile(tilePosition, tile);
         }
     }
 }

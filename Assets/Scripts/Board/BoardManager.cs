@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Board.Persistence;
 using Common;
 using UnityEngine;
 
@@ -12,14 +13,13 @@ namespace Board
         public List<Board> boardObjects;
         public int currentBoard = 1;
 
-        public BoardData board1 = new BoardData
-        {
-            spawnPosition = new Vector3Int(-1, 7, 0),
-            cameraPosition = new Vector3Int(0, 0, -10),
-            boardPosition = new Vector3Int(0, 0, 0),
-            boardSize = new Vector2Int(10,20),
-            sortOrder = 2,
-        };
+        public BoardData board1 = new BoardData(
+            new Vector3Int(-1, 7, 0),
+            new Vector3Int(0, 0, -10),
+            new Vector3Int(0, 0, 0),
+            new Vector2Int(10, 20),
+            2
+        );
 
         /// <summary>
         /// Create 3 boards. First is the standard Tetris board as you would expect, the other two randomize the size.
@@ -82,13 +82,13 @@ namespace Board
                 -10
             );
 
-            return new BoardData {
-                spawnPosition = nextSpawn,
-                cameraPosition = nextCam,
-                boardPosition = nextBoardPos,
-                boardSize = nextBoardSize,
-                sortOrder = 2,
-            };
+            return new BoardData(
+                nextSpawn,
+                nextCam,
+                nextBoardPos,
+                nextBoardSize,
+                2
+            );
         }
 
         void Start() {
