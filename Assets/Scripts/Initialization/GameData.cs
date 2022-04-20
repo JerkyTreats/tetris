@@ -35,7 +35,10 @@ namespace Initialization
         private static void ProtoBufSerializationSetup() {
             var model = RuntimeTypeModel.Default;
             model.Add<Vector3IntSurrogate>();
-            model.Add<Vector3>(false).SetSurrogate(typeof(Vector3IntSurrogate));
+            model.Add<Vector3Int>(false).SetSurrogate(typeof(Vector3IntSurrogate));
+            
+            model.Add<Vector2IntSurrogate>();
+            model.Add<Vector2Int>(false).SetSurrogate(typeof(Vector2IntSurrogate));
         }
         
         // This is a gross hack that I hate 
@@ -50,5 +53,15 @@ namespace Initialization
             throw new ApplicationException($"Could not find block enum for item { tile.ToString() }" );
         }
 
+        public TileBase GetTileFromBlock(Block block)
+        {
+            foreach (var blockData in blocks)
+            {
+                if (block == blockData.block)
+                    return blockData.tile;
+            }
+
+            throw new ApplicationException($"Could not find block enum for item { block.ToString() }" );
+        }
     }
 }

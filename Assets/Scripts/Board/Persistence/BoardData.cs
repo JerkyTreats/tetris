@@ -34,19 +34,29 @@ namespace Board.Persistence
 
     [ProtoContract]
     public struct BoardTileData {
+        [ProtoMember(1)]
         public Block block;
+        [ProtoMember(2)]
         public Vector3Int position;
     }
 
     [ProtoContract]
     public enum Block {
+        [ProtoMember(0)]
         Blue,
+        [ProtoMember(1)]
         Cyan,
+        [ProtoMember(2)]
         Ghost,
+        [ProtoMember(3)]
         Green,
+        [ProtoMember(4)]
         Orange,
+        [ProtoMember(5)]
         Purple,
+        [ProtoMember(6)]
         Red,
+        [ProtoMember(7)]
         Yellow,
     }
 
@@ -67,5 +77,22 @@ namespace Board.Persistence
 
         public static implicit operator Vector3IntSurrogate(Vector3Int vector) =>
             new Vector3IntSurrogate { X = vector.x, Y = vector.y, Z = vector.z };
+    }
+    
+    [ProtoContract]
+    public struct Vector2IntSurrogate
+    {
+        [ProtoMember(1)]
+        public int X { get; set; }
+
+        [ProtoMember(2)]
+        public int Y { get; set; }
+
+
+        public static implicit operator Vector2Int(Vector2IntSurrogate vector) =>
+            new Vector2Int(vector.X, vector.Y);
+
+        public static implicit operator Vector2IntSurrogate(Vector2Int vector) =>
+            new Vector2IntSurrogate { X = vector.x, Y = vector.y };
     }
 }

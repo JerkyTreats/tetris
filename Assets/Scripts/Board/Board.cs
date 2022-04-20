@@ -96,6 +96,14 @@ namespace Board
             }
         }
 
+        private void Start()
+        {
+            foreach (var tileData in data.tiles)
+            {
+                Tilemap.SetTile(tileData.position, GameData.GetTileFromBlock(tileData.block));
+            }
+        }
+
         #endregion
         
         // TODO These two functions should probably be an interface for all Activatable objects

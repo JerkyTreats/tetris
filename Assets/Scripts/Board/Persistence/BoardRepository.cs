@@ -29,6 +29,11 @@ namespace Board.Persistence
             throw new NotImplementedException();
         }
 
+        public BoardData Read()
+        {
+            return _dataContext.LoadBoard();
+        }
+
         public void Delete(BoardData boardData)
         {
             throw new NotImplementedException();

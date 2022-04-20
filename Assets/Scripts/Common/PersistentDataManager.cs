@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using Board.Persistence;
 using ProtoBuf;
 using UnityEngine;
@@ -40,14 +41,19 @@ namespace Common
         }
 
         private static int GetHighestSaveFileNum() {
-            var highestSaveNum = 0;
-
             var files = Directory.GetFiles(Application.persistentDataPath);
 
+            if (files.Length == 0) return 0;
+            
+            var highestSaveNum = 0;
+            
             foreach(var filePath in files)
             {
 
                 var fileName = Path.GetFileName(filePath);
+
+                if (!fileName.Contains(SaveFileName)) continue;
+                
                 // [save, 001.dat]
                 var saveNameArr = fileName.Split(new string[] { SaveFileName }, StringSplitOptions.None);
                 // [001, .dat]
@@ -66,8 +72,23 @@ namespace Common
         public void SaveBoard(BoardData boardData)
         {
             using var file = File.OpenWrite(_saveFile);
-            Serializer.Serialize(file, boardData);
-            file.Close();
+            using var gzip = new GZipStream(file, CompressionMode.Compress);
+
+            Serializer.SerializeWithLengthPrefix(gzip, boardData, PrefixStyle.Fixed32BigEndian);
+        }
+
+        public BoardData LoadBoard()
+        {
+            var latestFile = GetHighestSaveFileNum(); 
+            var fileName = $"{SaveFileName}{latestFile:D3}{SaveFileType}";
+            var filePath = Path.Combine(_saveDir, fileName);
+            
+            using var file = File.OpenRead(filePath);
+            using var gzip = new GZipStream(file, CompressionMode.Decompress);
+
+            var thing = Serializer.DeserializeWithLengthPrefix<BoardData>(gzip, PrefixStyle.Fixed32BigEndian);
+            Debug.Log(thing.boardSize);
+            return thing;
         }
     }
 }

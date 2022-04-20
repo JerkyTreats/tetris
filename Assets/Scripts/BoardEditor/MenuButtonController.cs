@@ -28,6 +28,12 @@ namespace BoardEditor
         {
             newBoardButton.onClick.AddListener(CreateBoard);
             saveBoardButton.onClick.AddListener(SaveBoard);
+            loadBoardButton.onClick.AddListener(LoadBoard);
+        }
+
+        private void CreateBoard()
+        {
+            _board = Board.Board.CreateNewBoard(board1);
         }
 
         private void SaveBoard()
@@ -39,9 +45,13 @@ namespace BoardEditor
             
         }
 
-        private void CreateBoard()
+        private void LoadBoard()
         {
-            _board = Board.Board.CreateNewBoard(board1);
+            if (!_boardRepo)
+                _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
+
+            var data = _boardRepo.Read();
+            _board = Board.Board.CreateNewBoard(data);
         }
         
         
