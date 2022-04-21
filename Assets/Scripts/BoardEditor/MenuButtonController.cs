@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Board.Persistence;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,9 @@ namespace BoardEditor
         private BoardRepository _boardRepo;
         //Make sure to attach these Buttons in the Inspector
         public Button newBoardButton, saveBoardButton, loadBoardButton;
+        
+        public delegate void MenuButtonControllerDelegate(MenuButtonController menuButtonController);
+        public event MenuButtonControllerDelegate CreateBoardEvent;
 
         // TODO Serialize to file nephew.
         // Duplicated from BoardManager
@@ -33,11 +37,14 @@ namespace BoardEditor
 
         private void CreateBoard()
         {
+            Clear();
             _board = Board.Board.CreateNewBoard(board1);
+            CreateBoardEvent?.Invoke(this);
         }
 
         private void SaveBoard()
         {
+            Clear();
             if (!_boardRepo)
                 _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
             
@@ -47,6 +54,7 @@ namespace BoardEditor
 
         private void LoadBoard()
         {
+            Clear();
             if (!_boardRepo)
                 _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
 
@@ -55,5 +63,13 @@ namespace BoardEditor
         }
         
         
+        private static void Clear()
+        {
+            var boards = FindObjectsOfType<Board.Board>();
+            foreach (var board in boards)
+            {
+                Destroy(board.gameObject);
+            }
+        }
     }
 }
