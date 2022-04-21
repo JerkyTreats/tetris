@@ -7,25 +7,31 @@ namespace BoardEditor
     /// <summary>
     /// Controller for the BoardEditor UI element "TilePanel"
     /// </summary>
-    public class TilePanelController : MonoBehaviour
+    public class TilePanelController : MonoBehaviour, IContextMenu<NewBoardContextController>
     {
+        private CanvasGroup _canvasGroup;
+        
         private void Awake()
         {
+            _canvasGroup = GetComponent<CanvasGroup>();
+
             // Register the menu button event then disable 
-            var menuButtonController = FindObjectOfType<MenuButtonController>();
-            menuButtonController.CreateBoardEvent += Enable;
+            var newBoardContextController = FindObjectOfType<NewBoardContextController>();
+            newBoardContextController.CreateBoardEvent += Enable;
             Disable(); 
         }
 
         // Enable the TilePanel by event
-        private void Enable(MenuButtonController _)
+        public void Enable(NewBoardContextController _)
         {
-            gameObject.SetActive(true);
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
         }
 
         private void Disable()
         {
-            gameObject.SetActive(false);
+            _canvasGroup.alpha = 0f;
+            _canvasGroup.blocksRaycasts = false;
         }
     }
 }

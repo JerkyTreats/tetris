@@ -1,49 +1,83 @@
 using Common;
 using UnityEngine;
+using static UnityEngine.Screen;
 
 namespace Board
 {
-    public class BoardCamera
+    [RequireComponent(typeof(Camera))]
+    public class BoardCamera : MonoBehaviour
     {
-        private readonly GameObject _boardCamera;
-        private readonly Camera _camera;
-
-        public BoardCamera(GameObject parent, Vector3Int cameraPosition){
-            _boardCamera = new GameObject("Camera")
+        public Camera cam;
+        
+        public static BoardCamera CreateNewBoardCamera(Board board){
+            var boardCameraObject = new GameObject("Camera")
             {
                 transform =
                 {
-                    position = (Vector3)cameraPosition
+                    position = board.data.cameraPosition
                 }
             };
-            _boardCamera.SetActive(false);
+            boardCameraObject.SetActive(false);
+            
 
-            _boardCamera.AddComponent<Camera>();
-            _boardCamera.transform.parent = parent.transform;
+            var camera = boardCameraObject.AddComponent<Camera>();
+            boardCameraObject.transform.parent = board.transform;
 
-            _camera = _boardCamera.GetComponentInChildren<Camera>();
-            _camera.orthographic = true;
-            _camera.orthographicSize = 12.00f;
+            camera.orthographic = true;
+            camera.orthographicSize = FitOrthoCameraSizeToBoard(board);
         
             // TODO : Pull magic number into static variable, probably in gameData or something
-            _camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.clearFlags = CameraClearFlags.SolidColor;
             var color = Helpers.HexStringToColor("171B1F");
-            _camera.backgroundColor = color;
+            camera.backgroundColor = color;
+
+            var boardCamera = boardCameraObject.AddComponent<BoardCamera>();
+            boardCamera.cam = camera;
+    
+            return boardCamera;
+        }
+
+        private static float FitOrthoCameraSizeToBoard(Board board)
+        {
+            var screenRatio = width / (float)height;
+            var targetRatio = board.WorldBounds.size.x / (float)board.WorldBounds.size.y;
+            
+            if(screenRatio >= targetRatio)
+                return (float)board.WorldBounds.size.y / 2;
+
+            var differenceInSize = targetRatio / screenRatio;
+            return (float)board.WorldBounds.size.y / 2 * differenceInSize;
+        }
+
+        private void Awake()
+        {
+            cam = GetComponent<Camera>();
         }
     
         /// <summary>
         /// Makes this camera the one the user will be viewing.
         /// </summary>
         public void ActivateCamera() {
-            _boardCamera.tag = "MainCamera"; // sets Camera.main property
-            _boardCamera.SetActive(true);
-            _camera.enabled = true;
+            DisableAllOtherCameras();
+            gameObject.tag = "MainCamera"; // sets Camera.main property
+            gameObject.SetActive(true);
+            cam.enabled = true;
 
         }
 
         public void DeactivateCamera() {
-            _camera.enabled = false;
-            _boardCamera.SetActive(false);
+            cam.enabled = false;
+            gameObject.SetActive(false);
+        }
+
+        private static void DisableAllOtherCameras()
+        {
+            var cams = FindObjectsOfType<Camera>();
+            foreach (var cam in cams)
+            {
+                cam.enabled = false;
+                cam.gameObject.SetActive(false);
+            }
         }
 
     }

@@ -73,7 +73,7 @@ namespace Board
                 TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
             var board = boardGo.AddComponent<Board>();
             board.data = boardData;
-            board.boardCamera = new BoardCamera(board.gameObject, boardData.cameraPosition);
+            board.boardCamera = BoardCamera.CreateNewBoardCamera(board);
 
             board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
 

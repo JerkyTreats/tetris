@@ -10,48 +10,40 @@ namespace BoardEditor
     /// </summary>
     public class MenuButtonController : MonoBehaviour
     {
-        private Board.Board _board;
+        private static Camera _mainCam;
         private BoardRepository _boardRepo;
         //Make sure to attach these Buttons in the Inspector
         public Button newBoardButton, saveBoardButton, loadBoardButton;
         
         public delegate void MenuButtonControllerDelegate(MenuButtonController menuButtonController);
-        public event MenuButtonControllerDelegate CreateBoardEvent;
-
-        // TODO Serialize to file nephew.
-        // Duplicated from BoardManager
-        public BoardData board1 = new BoardData(
-            new Vector3Int(-1, 7, 0),
-            new Vector3Int(0, 0, -10),
-            new Vector3Int(0, 0, 0),
-            new Vector2Int(10,20),
-            2
-        );
+        public event MenuButtonControllerDelegate NewBoardEvent;
 
         private void Start()
         {
-            newBoardButton.onClick.AddListener(CreateBoard);
+            _mainCam = FindObjectOfType<Camera>();
+            newBoardButton.onClick.AddListener(NewBoard);
             saveBoardButton.onClick.AddListener(SaveBoard);
             loadBoardButton.onClick.AddListener(LoadBoard);
         }
 
-        private void CreateBoard()
+        private void NewBoard()
         {
-            Clear();
-            _board = Board.Board.CreateNewBoard(board1);
-            CreateBoardEvent?.Invoke(this);
+            NewBoardEvent?.Invoke(this);
         }
 
+        // TODO review if findobject can be improved here
         private void SaveBoard()
         {
             Clear();
             if (!_boardRepo)
                 _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
-            
-            _boardRepo.Create(_board.data);
+
+            var board = FindObjectOfType<Board.Board>();
+            _boardRepo.Create(board.data);
             
         }
 
+        // TODO cycle back here and fix this 
         private void LoadBoard()
         {
             Clear();
@@ -59,10 +51,10 @@ namespace BoardEditor
                 _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
 
             var data = _boardRepo.Read();
-            _board = Board.Board.CreateNewBoard(data);
+            Board.Board.CreateNewBoard(data);
         }
-        
-        
+
+        // TODO Fix with NewBoardContext
         private static void Clear()
         {
             var boards = FindObjectsOfType<Board.Board>();
@@ -70,6 +62,9 @@ namespace BoardEditor
             {
                 Destroy(board.gameObject);
             }
+            
+            _mainCam.enabled = true;
+            _mainCam.gameObject.SetActive(true);
         }
     }
 }
