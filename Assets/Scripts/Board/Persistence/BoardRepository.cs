@@ -1,22 +1,23 @@
 using System;
 using UnityEngine;
 using Common;
+using Persistence;
 
 namespace Board.Persistence
 {
     public class BoardRepository : ScriptableObject, IBoardRepository
     {
-        private PersistentDataManager _dataContext;
+        private LocalFileDataContext _dataContext;
 
         public void Awake()
         {
-            _dataContext = new PersistentDataManager();
+            _dataContext = new LocalFileDataContext();
         }
 
         public void Create(BoardData boardData)
         {
             Debug.Log(Application.persistentDataPath); 
-            _dataContext.SaveBoard(boardData);
+            _dataContext.Save<BoardData>(boardData);
         }
 
         public void Modify(BoardData boardData)
@@ -31,7 +32,7 @@ namespace Board.Persistence
 
         public BoardData Read()
         {
-            return _dataContext.LoadBoard();
+            return _dataContext.Load<BoardData>();
         }
 
         public void Delete(BoardData boardData)
