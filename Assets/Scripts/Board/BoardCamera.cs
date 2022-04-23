@@ -7,7 +7,7 @@ namespace Board
     [RequireComponent(typeof(Camera))]
     public class BoardCamera : MonoBehaviour
     {
-        public Camera cam;
+        [SerializeField] private Camera cam;
         
         public static BoardCamera CreateNewBoardCamera(Board board){
             var boardCameraObject = new GameObject("Camera")
@@ -24,7 +24,7 @@ namespace Board
             boardCameraObject.transform.parent = board.transform;
 
             camera.orthographic = true;
-            camera.orthographicSize = FitOrthoCameraSizeToBoard(board);
+            camera.orthographicSize = OrthoCameraSizeFitToBoard(board);
         
             // TODO : Pull magic number into static variable, probably in gameData or something
             camera.clearFlags = CameraClearFlags.SolidColor;
@@ -37,7 +37,7 @@ namespace Board
             return boardCamera;
         }
 
-        private static float FitOrthoCameraSizeToBoard(Board board)
+        public static float OrthoCameraSizeFitToBoard(Board board)
         {
             var screenRatio = width / (float)height;
             var targetRatio = board.WorldBounds.size.x / (float)board.WorldBounds.size.y;

@@ -20,7 +20,7 @@ namespace Board
         public BoardBackground background;
 
         public GameData GameData { get; private set; }
-        public BoardCamera boardCamera;
+        public BoardCamera BoardCamera { get; private set; }
         public GameController gameController;
 
         public Tilemap Tilemap { get; private set; }
@@ -73,7 +73,7 @@ namespace Board
                 TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
             var board = boardGo.AddComponent<Board>();
             board.data = boardData;
-            board.boardCamera = BoardCamera.CreateNewBoardCamera(board);
+            board.BoardCamera = BoardCamera.CreateNewBoardCamera(board);
 
             board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
 
@@ -109,13 +109,13 @@ namespace Board
         // TODO These two functions should probably be an interface for all Activatable objects
         public void OnActivate()
         {
-            boardCamera.ActivateCamera();
+            BoardCamera.ActivateCamera();
             gameController.OnActivate();
         }
 
         public void OnDeactivate()
         {
-            boardCamera.DeactivateCamera();
+            BoardCamera.DeactivateCamera();
             gameController.OnDeactivate();
             Tilemap.ClearAllTiles();
         }
