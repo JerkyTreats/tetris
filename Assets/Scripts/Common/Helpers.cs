@@ -19,6 +19,11 @@ namespace Common
       }
     }
     
+    /// <summary>
+    /// Unity does not provide a friendly method to convert a Hex -> Color. So here we are. 
+    /// </summary>
+    /// <param name="hexString"></param>
+    /// <returns></returns>
     public static Color32 HexStringToColor(string hexString)
     {
       var hex = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);

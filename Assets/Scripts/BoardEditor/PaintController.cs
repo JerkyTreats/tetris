@@ -23,6 +23,9 @@ namespace BoardEditor
             }
             var paintTileMapObject = TileGameObjectFactory.CreateNewTileObject("PaintGrid", Vector3Int.zero, 3);
             Tilemap = paintTileMapObject.GetComponent<Tilemap>();
+            
+            var newBoardContextController = FindObjectOfType<NewBoardContextController>();
+            newBoardContextController.CreateBoardEvent += CleanUp;
         }
 
         // on PaintButton delegate event fire
@@ -42,6 +45,12 @@ namespace BoardEditor
             {
                 Destroy(activePainter.gameObject);
             }
+        }
+        
+        private void CleanUp(NewBoardContextController _)
+        {
+            ActivePainterCleanUp();
+            Tilemap.ClearAllTiles();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace BoardEditor
     {
         private Tile Tile { get; set; }
         private Tilemap TileMap { get; set; }
-        private Block block { get; set; } 
+        private Block Block { get; set; } 
         
         public Board.Board board;
 
@@ -24,7 +24,7 @@ namespace BoardEditor
             var activePaintTile = activePaintTileObject.AddComponent<ActivePaintTile>();
             activePaintTile.Tile = paintButton.tile;
             activePaintTile.TileMap = tilemap;
-            activePaintTile.block = block;
+            activePaintTile.Block = block;
         }
         
         private void Start()
@@ -55,7 +55,7 @@ namespace BoardEditor
             var tilePosition = TileMap.WorldToCell(worldPos);
 
             if (board.IsValidPosition(tilePosition))
-                board.SetTile(block, tilePosition, Tile);
+                board.SetTile(Block, tilePosition, Tile);
         }
     }
 }

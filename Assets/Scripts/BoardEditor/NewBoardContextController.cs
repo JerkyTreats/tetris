@@ -1,4 +1,5 @@
 using System;
+using Board;
 using Board.Persistence;
 using TMPro;
 using UnityEngine;
@@ -8,12 +9,18 @@ namespace BoardEditor
 {
     public class NewBoardContextController : MonoBehaviour, IContextMenu<MenuButtonController>
     {
-        private Board.Board _board;
+        public Board.Board ActiveBoard { get; private set; }
         private CanvasGroup _canvasGroup;
-        private static Camera _mainCam;
 
-        // TODO Serialize to file nephew.
-        // Duplicated from BoardManager
+        [SerializeField] private Button createNewBoardButton;
+        [SerializeField] private Button cancelNewBoardButton;
+        [SerializeField] private TMP_InputField boardHeight;
+        [SerializeField] private TMP_InputField boardWidth;
+        
+        // TODO NewBoardContextController - Fix default BoardData location 
+        // A case could be made this should be right up into GameData.asset
+        // This was duplicated from BoardManager
+        // Can be considered a "default Tetris board"
         private BoardData _defaultBoard = new BoardData(
             new Vector3Int(-1, 7, 0),
             new Vector3Int(0, 0, -10),
@@ -22,17 +29,11 @@ namespace BoardEditor
             2
         );
 
-        public Button createNewBoardButton;
-        public Button cancelNewBoardButton;
-        public TMP_InputField boardHeight;
-        public TMP_InputField boardWidth;
-
         public delegate void NewBoardContextControllerDelegate(NewBoardContextController newBoardContextController);
         public event NewBoardContextControllerDelegate CreateBoardEvent;
         
         private void Awake()
         {
-            _mainCam = FindObjectOfType<Camera>();
             _canvasGroup = GetComponent<CanvasGroup>();
             createNewBoardButton.onClick.AddListener(CreateBoard);
             cancelNewBoardButton.onClick.AddListener(Disable);
@@ -43,60 +44,54 @@ namespace BoardEditor
             Disable(); 
         }
 
+        /// <summary>
+        /// Makes the UI element appear and functional
+        /// </summary>
         public void Enable(MenuButtonController _)
         {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
         }
-
-        //
-        private void CreateBoard()
-        {
-            Clear();
-            
-            var boardSize = GetBoardSize();
-            _defaultBoard.boardSize = boardSize;
-            
-            _board = Board.Board.CreateNewBoard(_defaultBoard);
-            _board.boardCamera.ActivateCamera();
-            
-            CreateBoardEvent?.Invoke(this);
-            Disable();
-        }
-
-        // TODO Magic numbers
-        // Parse the input boxes for width/height or use default
-        private Vector2Int GetBoardSize()
-        {
-            var defaultWidth = 10;
-            var defaultHeight = 20;
-
-            var widthSuccess = Int32.TryParse(boardWidth.text, out var width);
-            var heightSuccess = Int32.TryParse(boardHeight.text, out var height);
-            
-            width = widthSuccess ? width : defaultWidth;
-            height = heightSuccess ? height : defaultHeight;
-            
-            return new Vector2Int(width , height);
-            
-        }
-
+        
+        // Make board invisible + nonfunctional
         private void Disable()
         {
             _canvasGroup.alpha = 0f;
             _canvasGroup.blocksRaycasts = false;
         }
 
-        private static void Clear()
+        private void CreateBoard()
         {
-            var boards = FindObjectsOfType<Board.Board>();
-            foreach (var board in boards)
-            {
-                Destroy(board.gameObject);
-            }
+            UIHelpers.Clear(); // Remove any existing board
+            
+            var boardSize = GetBoardSize(); // Boardsize by input
+            _defaultBoard.boardSize = boardSize;
+            
+            ActiveBoard = Board.Board.CreateNewBoard(_defaultBoard); 
+            
+            // Default camera behaviour is to fit whole screen, we must change to fit UI 
+            var fitCamSize = BoardCamera.OrthoCameraSizeFitToBoard(ActiveBoard);
+            ActiveBoard.BoardCamera.ActivateCamera();
+            
+            CreateBoardEvent?.Invoke(this);
+            Disable();
+        }
 
-            _mainCam.enabled = true;
-            _mainCam.gameObject.SetActive(true);
+        // TODO NewBoardContextController - Fix BoardSize Magic numbers
+        // Parse the input boxes for width/height or use default
+        private Vector2Int GetBoardSize()
+        {
+            const int defaultWidth = 10;
+            const int defaultHeight = 20;
+
+            var widthSuccess = Int32.TryParse(boardWidth.text, out var width);
+            var heightSuccess = Int32.TryParse(boardHeight.text, out var height);
+
+            // Valid int in input field else default 
+            width = widthSuccess ? width : defaultWidth;
+            height = heightSuccess ? height : defaultHeight;
+
+            return new Vector2Int(width, height);
         }
     }
 }
