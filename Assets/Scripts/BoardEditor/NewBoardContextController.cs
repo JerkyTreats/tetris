@@ -7,8 +7,16 @@ using UnityEngine.UI;
 
 namespace BoardEditor
 {
+    /// <summary>
+    /// Controller for the NewBoardContext menu, controlling settings for creating a new Board
+    /// </summary>
     public class NewBoardContextController : MonoBehaviour, IContextMenu<MenuButtonController>
     {
+        // TODO: NewBoardContextController: UI Padding to top-level UI ScriptableObject Asset
+        // This field represents the padding for the UI whilst in Portrait mode. 
+        // Not only is it magic numbers, it also will likely need to be extended to support landscape.
+        // NewBoardContextController is the only place it's needed now, but its not the "correct" place for it.
+        [SerializeField] private Vector2 uiPadding = new Vector2(100, 500f);
         public Board.Board ActiveBoard { get; private set; }
         private CanvasGroup _canvasGroup;
 
@@ -66,12 +74,9 @@ namespace BoardEditor
             
             var boardSize = GetBoardSize(); // Boardsize by input
             _defaultBoard.boardSize = boardSize;
-            
-            ActiveBoard = Board.Board.CreateNewBoard(_defaultBoard); 
-            
-            // Default camera behaviour is to fit whole screen, we must change to fit UI 
-            var fitCamSize = BoardCamera.OrthoCameraSizeFitToBoard(ActiveBoard);
-            ActiveBoard.BoardCamera.ActivateCamera();
+
+            ActiveBoard = Board.Board.CreateNewBoard(_defaultBoard);
+            SetupBoardCamera();
             
             CreateBoardEvent?.Invoke(this);
             Disable();
@@ -92,6 +97,26 @@ namespace BoardEditor
             height = heightSuccess ? height : defaultHeight;
 
             return new Vector2Int(width, height);
+        }
+
+        // Default camera behaviour is to fit whole screen, we must change to fit UI 
+        private void SetupBoardCamera()
+        {
+            // Get percentage of padding to Canvas, send as input for BoardCamera size 
+            var canvasRect = GetComponentInParent<Canvas>().GetComponent<RectTransform>().rect;
+            var paddingX = uiPadding.x / canvasRect.width;
+            var paddingY = uiPadding.y / canvasRect.height;
+            
+            var fitCamSize = BoardCamera.OrthoCameraSizeFitToBoard(ActiveBoard, new Vector2(paddingX, paddingY));
+            
+            // Assign the padded size to the BoardCam
+            ActiveBoard.BoardCamera.Cam.orthographicSize = fitCamSize;
+            
+            // Offset Camera position to avoid UI overlap
+            
+            
+            // Activate the BoardCam
+            ActiveBoard.BoardCamera.ActivateCamera(); 
         }
     }
 }

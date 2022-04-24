@@ -2243,6 +2243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 867e50600ed824d87ade1a9df333116d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiPadding: {x: 100, y: 500}
   createNewBoardButton: {fileID: 1885234958}
   cancelNewBoardButton: {fileID: 2095309050}
   boardHeight: {fileID: 1837391044}

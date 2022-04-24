@@ -7,7 +7,7 @@ namespace Board
     [RequireComponent(typeof(Camera))]
     public class BoardCamera : MonoBehaviour
     {
-        [SerializeField] private Camera cam;
+        public Camera Cam { get; private set; }
         
         public static BoardCamera CreateNewBoardCamera(Board board){
             var boardCameraObject = new GameObject("Camera")
@@ -32,26 +32,32 @@ namespace Board
             camera.backgroundColor = color;
 
             var boardCamera = boardCameraObject.AddComponent<BoardCamera>();
-            boardCamera.cam = camera;
+            boardCamera.Cam = camera;
     
             return boardCamera;
         }
 
-        public static float OrthoCameraSizeFitToBoard(Board board)
+        public static float OrthoCameraSizeFitToBoard(Board board, Vector2 padding)
         {
-            var screenRatio = width / (float)height;
-            var targetRatio = board.WorldBounds.size.x / (float)board.WorldBounds.size.y;
-            
+            var paddedHalfBoard = board.WorldBounds.size.y / (2 - (2 * padding.y));
+            var screenRatio = (float)width / height;
+            var targetRatio = (float)board.WorldBounds.size.x / board.WorldBounds.size.y;
+
             if(screenRatio >= targetRatio)
-                return (float)board.WorldBounds.size.y / 2;
+                return paddedHalfBoard;
 
             var differenceInSize = targetRatio / screenRatio;
-            return (float)board.WorldBounds.size.y / 2 * differenceInSize;
+            return paddedHalfBoard * differenceInSize;
+        }
+
+        public static float OrthoCameraSizeFitToBoard(Board board)
+        {
+            return OrthoCameraSizeFitToBoard(board, new Vector2());
         }
 
         private void Awake()
         {
-            cam = GetComponent<Camera>();
+            Cam = GetComponent<Camera>();
         }
     
         /// <summary>
@@ -61,12 +67,12 @@ namespace Board
             DisableAllOtherCameras();
             gameObject.tag = "MainCamera"; // sets Camera.main property
             gameObject.SetActive(true);
-            cam.enabled = true;
+            Cam.enabled = true;
 
         }
 
         public void DeactivateCamera() {
-            cam.enabled = false;
+            Cam.enabled = false;
             gameObject.SetActive(false);
         }
 
