@@ -20,8 +20,7 @@ namespace BoardEditor
         [SerializeField] private Button loadBoardButton;
         
         public delegate void MenuButtonControllerDelegate(MenuButtonController menuButtonController);
-
-        public event MenuButtonControllerDelegate NewBoardEvent;
+        public event MenuButtonControllerDelegate NewBoardEvent, LoadBoardEvent;
 
         private void Start()
         {
@@ -46,22 +45,14 @@ namespace BoardEditor
             _boardRepo.Create(ActiveBoard.data);
         }
 
-        // TODO MenuButtonController: Implement LoadBoard 
         private void LoadBoard()
         {
-            UIHelpers.Clear();
-            if (!_boardRepo)
-                _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
-
-            var data = _boardRepo.Read();
-            ActiveBoard = Board.Board.CreateNewBoard(data);
-            ActiveBoard.BoardCamera.ActivateCamera();
+            LoadBoardEvent?.Invoke(this);
         }
 
         private void SetBoard(NewBoardContextController newBoardContextController)
         {
             ActiveBoard = newBoardContextController.ActiveBoard;
         }
-
     }
 }
