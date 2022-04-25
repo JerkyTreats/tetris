@@ -56,9 +56,10 @@ namespace BoardEditor
             // Offset Camera position to avoid UI overlap
             var cam = _board.BoardCamera.Cam;
 
-            var paddingWorldSpacePercent = _uiPadding.y / _canvasRect.height;
+            var paddingX = _uiPadding.x / _canvasRect.width;
+            var paddingY = _uiPadding.y / _canvasRect.height;
             var cameraTopRight = cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, cam.pixelHeight));
-            var paddingWorldSpaceAmount = cameraTopRight * paddingWorldSpacePercent;
+            var paddingWorldSpaceAmount = new Vector3( cameraTopRight.x * paddingX, cameraTopRight.y * paddingY);
 
             var cameraBottomLeft = cam.ScreenToWorldPoint(new Vector3()); // Always 0,0 in pixel space
             var boardBottomLeft = new Vector3(_board.WorldBounds.min.x, _board.WorldBounds.min.y);
