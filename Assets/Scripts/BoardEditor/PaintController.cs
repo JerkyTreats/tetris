@@ -47,7 +47,7 @@ namespace BoardEditor
             }
         }
         
-        private void CleanUp(NewBoardContextController _)
+        private void CleanUp()
         {
             ActivePainterCleanUp();
             Tilemap.ClearAllTiles();

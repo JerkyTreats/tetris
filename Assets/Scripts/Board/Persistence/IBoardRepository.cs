@@ -6,7 +6,7 @@ namespace Board.Persistence
     {
         void Create(BoardData boardData);
         void Modify(BoardData boardData);
-        void Read(BoardData boardData);
+        BoardData Read(string itemToRetrieve);
         void Delete(BoardData boardData);
     }
 }

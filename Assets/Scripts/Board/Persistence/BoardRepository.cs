@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Common;
 using Persistence;
@@ -16,7 +18,6 @@ namespace Board.Persistence
 
         public void Create(BoardData boardData)
         {
-            Debug.Log(Application.persistentDataPath); 
             _dataContext.Save<BoardData>(boardData);
         }
 
@@ -25,14 +26,23 @@ namespace Board.Persistence
             throw new NotImplementedException();
         }
 
-        public void Read(BoardData boardData)
+        public BoardData Read(string itemToRetrieve)
         {
-            throw new NotImplementedException();
+            return _dataContext.Load<BoardData>(itemToRetrieve);
         }
 
-        public BoardData Read()
+        public List<string> GetSavedFiles()
         {
-            return _dataContext.Load<BoardData>();
+            var paths = Directory.GetFiles(_dataContext.SaveDir);
+            var list = new List<string>();
+            foreach (var path in paths)
+            {
+                var fileName =  Path.GetFileName(path);
+                if (fileName.Contains(LocalFileDataContext.SaveFileName))
+                    list.Add(fileName);
+            }
+
+            return list;
         }
 
         public void Delete(BoardData boardData)

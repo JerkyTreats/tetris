@@ -19,7 +19,7 @@ namespace BoardEditor
         [SerializeField] private Button saveBoardButton;
         [SerializeField] private Button loadBoardButton;
         
-        public delegate void MenuButtonControllerDelegate(MenuButtonController menuButtonController);
+        public delegate void MenuButtonControllerDelegate();
         public event MenuButtonControllerDelegate NewBoardEvent, LoadBoardEvent;
 
         private void Start()
@@ -28,13 +28,13 @@ namespace BoardEditor
             saveBoardButton.onClick.AddListener(SaveBoard);
             loadBoardButton.onClick.AddListener(LoadBoard);
             
-            var newBoardContextController = FindObjectOfType<NewBoardContextController>();
-            newBoardContextController.CreateBoardEvent += SetBoard;
+            // var newBoardContextController = FindObjectOfType<NewBoardContextController>();
+            // newBoardContextController.CreateBoardEvent += SetBoard;
         }
 
         private void NewBoard()
         {
-            NewBoardEvent?.Invoke(this);
+            NewBoardEvent?.Invoke();
         }
 
         private void SaveBoard()
@@ -47,12 +47,12 @@ namespace BoardEditor
 
         private void LoadBoard()
         {
-            LoadBoardEvent?.Invoke(this);
+            LoadBoardEvent?.Invoke();
         }
 
-        private void SetBoard(NewBoardContextController newBoardContextController)
-        {
-            ActiveBoard = newBoardContextController.ActiveBoard;
-        }
+        // private void SetBoard(NewBoardContextController newBoardContextController)
+        // {
+        //     ActiveBoard = newBoardContextController.ActiveBoard;
+        // }
     }
 }

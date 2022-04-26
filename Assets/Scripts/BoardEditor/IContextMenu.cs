@@ -1,7 +1,7 @@
 namespace BoardEditor
 {
-    public interface IContextMenu<in T>
+    public interface IContextMenu
     {
-        void Enable(T eventController);
+        void Enable();
     }
 }

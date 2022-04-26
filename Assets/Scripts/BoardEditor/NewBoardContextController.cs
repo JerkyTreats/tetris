@@ -9,7 +9,7 @@ namespace BoardEditor
     /// <summary>
     /// Controller for the NewBoardContext menu, controlling settings for creating a new Board
     /// </summary>
-    public class NewBoardContextController : MonoBehaviour, IContextMenu<MenuButtonController>
+    public class NewBoardContextController : MonoBehaviour, IContextMenu
     {
         private BoardEditorBoardFactory _boardEditorBoardFactory;
         public Board.Board ActiveBoard { get; private set; }
@@ -33,7 +33,7 @@ namespace BoardEditor
             2
         );
 
-        public delegate void NewBoardContextControllerDelegate(NewBoardContextController newBoardContextController);
+        public delegate void NewBoardContextControllerDelegate();
         public event NewBoardContextControllerDelegate CreateBoardEvent;
         
         private void Awake()
@@ -51,7 +51,7 @@ namespace BoardEditor
         /// <summary>
         /// Makes the UI element appear and functional
         /// </summary>
-        public void Enable(MenuButtonController _)
+        public void Enable()
         {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
@@ -75,7 +75,7 @@ namespace BoardEditor
             _boardEditorBoardFactory = new BoardEditorBoardFactory(canvasRectTransform.rect);
             ActiveBoard = _boardEditorBoardFactory.CreateNewBoard(_defaultBoard);
 
-            CreateBoardEvent?.Invoke(this);
+            CreateBoardEvent?.Invoke();
             Disable();
         }
 

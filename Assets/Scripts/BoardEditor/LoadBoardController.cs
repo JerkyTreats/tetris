@@ -1,18 +1,40 @@
+using System;
 using Board.Persistence;
+using Persistence;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
 
 namespace BoardEditor
 {
     [RequireComponent(typeof(CanvasGroup)) ]
-    public class LoadBoardController : MonoBehaviour, IContextMenu<MenuButtonController>
+    public class LoadBoardController : MonoBehaviour, IContextMenu
     {
         private CanvasGroup _canvasGroup;
         private BoardRepository _boardRepo;
+
+        public BoardRepository BoardRepo
+        {
+            get
+            {
+                if (!_boardRepo)
+                    _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
+                return _boardRepo;
+            }
+        }
         private Board.Board _board;
 
+        [SerializeField] private GameObject loadListPanel;
+        [SerializeField] private GameObject loadSelectionPanel;
         [SerializeField] private Button loadBoardButton;
         [SerializeField] private Button cancelButton;
+        
+        // public event Action<NewBoardContextController> LoadBoardEvent;
+        public delegate void LoadBoardControllerDelegate();
+        public event LoadBoardControllerDelegate LoadBoardEvent;
+
+        public string SelectedFile { get; set; }
 
         private void Awake()
         {
@@ -23,27 +45,50 @@ namespace BoardEditor
             // Register the menu button event then disable 
             var menuButtonController = FindObjectOfType<MenuButtonController>();
             menuButtonController.LoadBoardEvent += Enable;
+            
             Disable(); 
         }
 
         private void LoadBoard()
         {
             UIHelpers.Clear();
-            if (!_boardRepo)
-                _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
 
-            var data = _boardRepo.Read();
-            _board = Board.Board.CreateNewBoard(data);
+            var data = BoardRepo.Read(SelectedFile);
+            var factory = new BoardEditorBoardFactory(GetComponentInParent<RectTransform>().rect);
+            _board = factory.CreateNewBoard(data);
             _board.BoardCamera.ActivateCamera();
+            
+            LoadBoardEvent?.Invoke();
             
             Disable();
         }
 
-        public void Enable(MenuButtonController eventController)
+        public void Enable()
         {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
+
+            PopulateLoadList();
         }
+
+        private void PopulateLoadList()
+        {
+            foreach (var path in BoardRepo.GetSavedFiles())
+            {
+                var selectionObject = Instantiate(loadSelectionPanel, loadListPanel.transform);
+                
+                var selection = selectionObject.GetComponent<LoadBoardSelectionController>();
+                selection.FileName = path;
+
+                selection.SelectEvent += LoadBoardSelected;
+            }
+        }
+
+        private void LoadBoardSelected(LoadBoardSelectionController loadBoardSelectionController)
+        {
+            SelectedFile = loadBoardSelectionController.FileName;
+        }
+
 
         private void Disable()
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using ProtoBuf;
@@ -10,25 +11,19 @@ namespace Persistence
     /// Provides CRUD operations from the local file system
     /// </summary>
     public class LocalFileDataContext {
-        private static readonly string SaveFileType;
-        private static readonly string SaveFileName;
+        public const string SaveFileType = ".dat";
+        public const string SaveFileName = "save";
         private readonly string _saveFile;
         private string _saveFileName;
 
-        private readonly string _saveDir = Application.persistentDataPath;
+        public readonly string SaveDir = Application.persistentDataPath;
 
         /// <summary>
         /// Create a new LocalFileDataContext 
         /// </summary>
         public LocalFileDataContext()
         {
-            _saveFile = Path.Combine(_saveDir, GetNewSaveFileName());
-        }
-
-        static LocalFileDataContext()
-        {
-            SaveFileType = ".dat";
-            SaveFileName = "save";
+            _saveFile = Path.Combine(SaveDir, GetNewSaveFileName());
         }
 
         /// <summary>
@@ -49,21 +44,24 @@ namespace Persistence
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Load<T>()
+        public T Load<T>(string fileName)
         {
-            var latestFile = GetHighestSaveFileNum(); 
-            var fileName = $"{SaveFileName}{latestFile:D3}{SaveFileType}";
-            var filePath = Path.Combine(_saveDir, fileName);
-            
+            var path = Path.Combine(SaveDir, fileName);
+
+            return DeserializedObject<T>(path);
+        }
+
+        private static T DeserializedObject<T>(string filePath)
+        {
             using var file = File.OpenRead(filePath);
             using var gzip = new GZipStream(file, CompressionMode.Decompress);
 
             var deserializedObject = Serializer.DeserializeWithLengthPrefix<T>(gzip, PrefixStyle.Fixed32BigEndian);
             return deserializedObject;
         }
-        
+
         // Generate a new file name in format {NAME}(001 + 1){FILETYPE}
-        private static string GetNewSaveFileName() {
+        private string GetNewSaveFileName() {
             // 1
             var highestSaveNum = GetHighestSaveFileNum(); 
 
@@ -77,7 +75,7 @@ namespace Persistence
         }
 
         // Find the highest int number given filename format {NAME}001{FILETYPE}
-        private static int GetHighestSaveFileNum() {
+        private int GetHighestSaveFileNum() {
             var files = Directory.GetFiles(Application.persistentDataPath);
 
             if (files.Length == 0) return 0;
