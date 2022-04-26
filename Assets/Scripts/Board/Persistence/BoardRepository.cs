@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Common;
 using Persistence;
@@ -33,11 +34,14 @@ namespace Board.Persistence
 
         public List<string> GetSavedFiles()
         {
-            var paths = Directory.GetFiles(_dataContext.SaveDir);
+            // var paths = Directory.GetFiles(_dataContext.SaveDir);
+            var paths = new DirectoryInfo(_dataContext.SaveDir).GetFiles()
+                .OrderByDescending(f => f.LastWriteTime)
+                .ToList();
             var list = new List<string>();
             foreach (var path in paths)
             {
-                var fileName =  Path.GetFileName(path);
+                var fileName =  Path.GetFileName(path.FullName);
                 if (fileName.Contains(LocalFileDataContext.SaveFileName))
                     list.Add(fileName);
             }
