@@ -14,7 +14,7 @@ namespace BoardEditor
         private CanvasGroup _canvasGroup;
         private BoardRepository _boardRepo;
 
-        public BoardRepository BoardRepo
+        private BoardRepository BoardRepo
         {
             get
             {
@@ -94,6 +94,18 @@ namespace BoardEditor
         {
             _canvasGroup.alpha = 0f;
             _canvasGroup.blocksRaycasts = false;
+            
+            DestroyAllChildren();
+        }
+
+        private void DestroyAllChildren()
+        {
+            var list = GetComponentsInChildren<LoadBoardSelectionController>();
+
+            foreach (var selector in list)
+            {
+                Destroy(selector.gameObject);
+            }
         }
     }
 }
