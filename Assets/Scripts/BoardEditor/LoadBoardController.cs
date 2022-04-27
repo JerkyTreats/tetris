@@ -1,29 +1,24 @@
-using System;
 using Board.Persistence;
-using Persistence;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
 namespace BoardEditor
 {
     [RequireComponent(typeof(CanvasGroup)) ]
-    public class LoadBoardController : MonoBehaviour, IContextMenu
+    public class LoadBoardController : MonoBehaviour
     {
         private CanvasGroup _canvasGroup;
-        private BoardRepository _boardRepo;
+        private BoardLocalFileRepository _boardLocalFileRepo;
 
-        private BoardRepository BoardRepo
+        private BoardLocalFileRepository BoardLocalFileRepo
         {
             get
             {
-                if (!_boardRepo)
-                    _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
-                return _boardRepo;
+                if (!_boardLocalFileRepo)
+                    _boardLocalFileRepo = ScriptableObject.CreateInstance<BoardLocalFileRepository>();
+                return _boardLocalFileRepo;
             }
         }
-        private Board.Board _board;
 
         [SerializeField] private GameObject loadListPanel;
         [SerializeField] private GameObject loadSelectionPanel;
@@ -31,10 +26,10 @@ namespace BoardEditor
         [SerializeField] private Button cancelButton;
         
         // public event Action<NewBoardContextController> LoadBoardEvent;
-        public delegate void LoadBoardControllerDelegate();
+        public delegate void LoadBoardControllerDelegate(Board.Board board);
         public event LoadBoardControllerDelegate LoadBoardEvent;
 
-        public string SelectedFile { get; set; }
+        private string SelectedFile { get; set; }
 
         private void Awake()
         {
@@ -44,7 +39,7 @@ namespace BoardEditor
 
             // Register the menu button event then disable 
             var menuButtonController = FindObjectOfType<MenuButtonController>();
-            menuButtonController.LoadBoardEvent += Enable;
+            menuButtonController.LoadBoardMenuClickEvent += Enable;
             
             Disable(); 
         }
@@ -53,12 +48,12 @@ namespace BoardEditor
         {
             UIHelpers.Clear();
 
-            var data = BoardRepo.Read(SelectedFile);
+            var data = BoardLocalFileRepo.Read(SelectedFile);
             var factory = new BoardEditorBoardFactory(GetComponentInParent<RectTransform>().rect);
-            _board = factory.CreateNewBoard(data);
-            _board.BoardCamera.ActivateCamera();
+            var board = factory.CreateNewBoard(data);
+            board.BoardCamera.ActivateCamera();
             
-            LoadBoardEvent?.Invoke();
+            LoadBoardEvent?.Invoke(board);
             
             Disable();
         }
@@ -73,7 +68,7 @@ namespace BoardEditor
 
         private void PopulateLoadList()
         {
-            foreach (var path in BoardRepo.GetSavedFiles())
+            foreach (var path in BoardLocalFileRepo.GetSavedFiles())
             {
                 var selectionObject = Instantiate(loadSelectionPanel, loadListPanel.transform);
                 

@@ -33,7 +33,13 @@ namespace Persistence
         /// <typeparam name="T"></typeparam>
         public void Save<T>(T toSave)
         {
-            using var file = File.OpenWrite(_saveFile);
+            Save<T>(toSave, _saveFile);
+        }
+
+        public void Save<T>(T toSave, string fileName)
+        {
+            var path = Path.Combine(SaveDir, fileName);
+            using var file = File.OpenWrite(path);
             using var gzip = new GZipStream(file, CompressionMode.Compress);
 
             Serializer.SerializeWithLengthPrefix(gzip, toSave, PrefixStyle.Fixed32BigEndian);

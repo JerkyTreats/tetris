@@ -7,20 +7,34 @@ namespace Board.Persistence
     [ProtoContract]
     public struct BoardData {
 
-        [ProtoMember(1)]
-        public Vector3Int spawnPosition;
-        [ProtoMember(2)]
-        public Vector3Int cameraPosition;
-        [ProtoMember(3)]
-        public Vector3Int boardPosition;
-        [ProtoMember(4)]
-        public Vector2Int boardSize;
-        [ProtoMember(5)]
-        public int sortOrder;
-        [ProtoMember(6)]
-        public List<BoardTileData> tiles;
+        [ProtoMember(1)] public Vector3Int spawnPosition;
+        [ProtoMember(2)] public Vector3Int cameraPosition;
+        [ProtoMember(3)] public Vector3Int boardPosition;
+        [ProtoMember(4)] public Vector2Int boardSize;
+        [ProtoMember(5)] public int sortOrder;
+        [ProtoMember(6)] public List<BoardTileData> tiles;
+        [ProtoMember(7)] public string userSavedBoardName;
 
-        public BoardData(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder = 0, List<BoardTileData> tiles = null)
+        // TODO BoardData : Objects data scope too wide
+        // SpawnPosition should likely be contained in an "ActivePieceData" object, not crammed in here
+        // userSavedBoardName is on notice as well - This might be better suited in a BoardDataSaveData object
+        // Wrapping BoardData with contextual data reduces reusability
+        // Really there's no reason why the Board object should have anything to do with Tetris or how to save, etc.
+        // This is likely a relic of the initial Board being the gameplay controller in addition to being a "Board"
+        // But I'm also cramming userSavedBoardName in here for now because it's my prototype and this is the corner I'm cutting today
+        // Sue me.
+        
+        /// <summary>
+        /// BoardData Constructor
+        /// </summary>
+        /// <param name="spawnPosition">Spawn Position for ActivePiece</param>
+        /// <param name="cameraPosition">BoardCamera Position</param>
+        /// <param name="boardPosition">Board Position in World Space</param>
+        /// <param name="boardSize">Width/Length of the Board</param>
+        /// <param name="sortOrder">Unity 2D sort order</param>
+        /// <param name="tiles">Tiles placed on the Board</param>
+        /// <param name="userSavedBoardName">Name provided by user for a saved board</param>
+        public BoardData(Vector3Int spawnPosition, Vector3Int cameraPosition, Vector3Int boardPosition, Vector2Int boardSize, int sortOrder = 0, List<BoardTileData> tiles = null, string userSavedBoardName = null)
         {
             this.spawnPosition = spawnPosition;
             this.cameraPosition  = cameraPosition;
@@ -29,6 +43,7 @@ namespace Board.Persistence
             this.sortOrder = sortOrder;
 
             this.tiles = tiles ?? new List<BoardTileData>();
+            this.userSavedBoardName = userSavedBoardName ?? "";
         }
     }
 

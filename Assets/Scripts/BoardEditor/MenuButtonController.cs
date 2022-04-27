@@ -9,50 +9,66 @@ namespace BoardEditor
     /// </summary>
     public class MenuButtonController : MonoBehaviour
     {
-        private BoardRepository _boardRepo;
-        private NewBoardContextController _newBoardContextController;
+        private BoardLocalFileRepository _boardLocalFileRepo;
+        private NewBoardController _newBoardController;
+        private LoadBoardController _loadBoardController;
+        private SaveBoardController _saveBoardController;
 
-        private Board.Board ActiveBoard { get; set; }
-
-        //Make sure to attach these Buttons in the Inspector
         [SerializeField] private Button newBoardButton;
         [SerializeField] private Button saveBoardButton;
         [SerializeField] private Button loadBoardButton;
-        
-        public delegate void MenuButtonControllerDelegate();
-        public event MenuButtonControllerDelegate NewBoardEvent, LoadBoardEvent;
 
-        private void Start()
+        public Board.Board ActiveBoard { get; set; }
+        
+        // Fire events when menu item clicked
+        public delegate void MenuButtonControllerDelegate();
+        public event MenuButtonControllerDelegate NewBoardMenuClickEvent, LoadBoardMenuClickEvent, SaveBoardMenuClickEvent;
+        
+        // Fire events if the "active" board is changed
+        public delegate void ActiveBoardDelegate(Board.Board board);
+        public event ActiveBoardDelegate ActivateBoardEvent;
+
+        private void Awake()
         {
             newBoardButton.onClick.AddListener(NewBoard);
             saveBoardButton.onClick.AddListener(SaveBoard);
             loadBoardButton.onClick.AddListener(LoadBoard);
+        }
+
+        private void Start()
+        {
             
-            // var newBoardContextController = FindObjectOfType<NewBoardContextController>();
-            // newBoardContextController.CreateBoardEvent += SetBoard;
+            _newBoardController = FindObjectOfType<NewBoardController>();
+            _newBoardController.NewBoardEvent += ActivateBoard;
+            
+            _loadBoardController = FindObjectOfType<LoadBoardController>();
+            _loadBoardController.LoadBoardEvent += ActivateBoard;
+
+            saveBoardButton.interactable = false;
         }
 
         private void NewBoard()
         {
-            NewBoardEvent?.Invoke();
+            NewBoardMenuClickEvent?.Invoke();
         }
 
         private void SaveBoard()
         {
-            if (!_boardRepo)
-                _boardRepo = ScriptableObject.CreateInstance<BoardRepository>();
-
-            _boardRepo.Create(ActiveBoard.data);
+            SaveBoardMenuClickEvent?.Invoke();
         }
 
         private void LoadBoard()
         {
-            LoadBoardEvent?.Invoke();
+            LoadBoardMenuClickEvent?.Invoke();
         }
 
-        // private void SetBoard(NewBoardContextController newBoardContextController)
-        // {
-        //     ActiveBoard = newBoardContextController.ActiveBoard;
-        // }
+        private void ActivateBoard(Board.Board board)
+        {
+            ActiveBoard = board;
+            ActivateBoardEvent?.Invoke(board);
+            
+            saveBoardButton.interactable = true;
+        }
+
     }
 }

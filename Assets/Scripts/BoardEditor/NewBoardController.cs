@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Board.Persistence;
 using TMPro;
 using UnityEngine;
@@ -9,11 +10,9 @@ namespace BoardEditor
     /// <summary>
     /// Controller for the NewBoardContext menu, controlling settings for creating a new Board
     /// </summary>
-    public class NewBoardContextController : MonoBehaviour, IContextMenu
+    public class NewBoardController : MonoBehaviour
     {
         private BoardEditorBoardFactory _boardEditorBoardFactory;
-        public Board.Board ActiveBoard { get; private set; }
-
         private CanvasGroup _canvasGroup;
 
         [SerializeField] private Button createNewBoardButton;
@@ -30,11 +29,12 @@ namespace BoardEditor
             new Vector3Int(0, 0, -10),
             new Vector3Int(0, 0, 0),
             new Vector2Int(10,20),
-            2
+            2,
+            new List<BoardTileData>()
         );
 
-        public delegate void NewBoardContextControllerDelegate();
-        public event NewBoardContextControllerDelegate CreateBoardEvent;
+        public delegate void NewBoardControllerDelegate(Board.Board board);
+        public event NewBoardControllerDelegate NewBoardEvent;
         
         private void Awake()
         {
@@ -44,14 +44,12 @@ namespace BoardEditor
 
             // Register the menu button event then disable 
             var menuButtonController = FindObjectOfType<MenuButtonController>();
-            menuButtonController.NewBoardEvent += Enable;
+            menuButtonController.NewBoardMenuClickEvent += Enable;
             Disable(); 
         }
 
-        /// <summary>
-        /// Makes the UI element appear and functional
-        /// </summary>
-        public void Enable()
+        // Makes the UI element appear and functional
+        private void Enable()
         {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
@@ -73,9 +71,9 @@ namespace BoardEditor
             
             var canvasRectTransform = GetComponentInParent<Canvas>().GetComponent<RectTransform>();
             _boardEditorBoardFactory = new BoardEditorBoardFactory(canvasRectTransform.rect);
-            ActiveBoard = _boardEditorBoardFactory.CreateNewBoard(_defaultBoard);
+            var board = _boardEditorBoardFactory.CreateNewBoard(_defaultBoard);
 
-            CreateBoardEvent?.Invoke();
+            NewBoardEvent?.Invoke(board);
             Disable();
         }
 

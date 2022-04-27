@@ -21,12 +21,21 @@ namespace BoardEditor
             {
                 paintButton.PainterSelectEvent += SelectTile;
             }
-            var paintTileMapObject = TileGameObjectFactory.CreateNewTileObject("PaintGrid", Vector3Int.zero, 3);
-            Tilemap = paintTileMapObject.GetComponent<Tilemap>();
-            
-            var newBoardContextController = FindObjectOfType<NewBoardContextController>();
-            newBoardContextController.CreateBoardEvent += CleanUp;
+
+            var newBoardController = FindObjectOfType<NewBoardController>();
+            newBoardController.NewBoardEvent += CleanUp;
+
+            var menuController = FindObjectOfType<MenuButtonController>();
+            menuController.SaveBoardMenuClickEvent += ActivePainterCleanUp;
+            menuController.LoadBoardMenuClickEvent += ActivePainterCleanUp;
+            menuController.ActivateBoardEvent += SetTileMap;
         }
+
+        private void SetTileMap(Board.Board board)
+        {
+            Tilemap = board.Tilemap;
+        }
+
 
         // on PaintButton delegate event fire
         private void SelectTile(PaintButton paintButton)
@@ -47,7 +56,7 @@ namespace BoardEditor
             }
         }
         
-        private void CleanUp()
+        private void CleanUp(Board.Board _)
         {
             ActivePainterCleanUp();
             Tilemap.ClearAllTiles();
