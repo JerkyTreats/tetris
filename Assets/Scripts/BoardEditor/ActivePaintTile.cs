@@ -1,12 +1,18 @@
+using Board.Persistence;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace BoardEditor
 {
+    /// <summary>
+    /// Tile selected to paint on a board
+    /// </summary>
     public class ActivePaintTile :MonoBehaviour
     {
         private Tile Tile { get; set; }
         private Tilemap TileMap { get; set; }
+        private Block Block { get; set; } 
+        
         public Board.Board board;
 
         /// <summary>
@@ -14,12 +20,14 @@ namespace BoardEditor
         /// </summary>
         /// <param name="paintButton"></param>
         /// <param name="tilemap"></param>
-        public static void CreateNewActivePainter(PaintButton paintButton, Tilemap tilemap)
+        /// <param name="block"></param>
+        public static void CreateNewActivePainter(PaintButton paintButton, Tilemap tilemap, Block block)
         {
             var activePaintTileObject = new GameObject("ActivePainter");
             var activePaintTile = activePaintTileObject.AddComponent<ActivePaintTile>();
             activePaintTile.Tile = paintButton.tile;
             activePaintTile.TileMap = tilemap;
+            activePaintTile.Block = block;
         }
         
         private void Start()
@@ -27,6 +35,7 @@ namespace BoardEditor
             board = FindObjectOfType<Board.Board>();
         }
 
+        // TODO ActivePaintTile Input System overhaul
         private void Update()
         {
             // Left click
@@ -38,6 +47,11 @@ namespace BoardEditor
                 Destroy(gameObject);
         }
 
+        // Convert user input on screen to coordinates on Board Grid
+        // Place a Tile at the location pressed
+        // TODO ActivePaintTile paints tile on Mouse position alone
+        // Should support mobile click 
+        // See issues for Input System overhaul
         private void PaintTile()
         {
             if (Camera.main == null) return;
@@ -49,8 +63,8 @@ namespace BoardEditor
             // Camera space to tilemap coord
             var tilePosition = TileMap.WorldToCell(worldPos);
 
-            if (board.IsValidPosition(tilePosition)) 
-                TileMap.SetTile(tilePosition, Tile);
+            if (board.IsValidPosition(tilePosition))
+                board.SetTile(Block, tilePosition, Tile);
         }
     }
 }

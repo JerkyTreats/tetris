@@ -1,4 +1,6 @@
+using Board.Persistence;
 using Common;
+using Initialization;
 using Tetris;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,16 +11,16 @@ namespace Board
     {
         #region Properties
 
-        private BoardData _data;
+        public BoardData data;
 
-        public Vector3Int BoardPosition => _data.boardPosition;
+        public Vector3Int BoardPosition => data.boardPosition;
 
         // Will likely be using these in the future but YAGNI for the moment
         public Border border;
         public BoardBackground background;
 
         public GameData GameData { get; private set; }
-        public BoardCamera boardCamera;
+        public BoardCamera BoardCamera { get; private set; }
         public GameController gameController;
 
         public Tilemap Tilemap { get; private set; }
@@ -32,11 +34,11 @@ namespace Board
             {
                 // Origin is middle of rect, position is bottom left
                 var position = new Vector2Int(
-                    _data.boardPosition.x - _data.boardSize.x / 2,
-                    _data.boardPosition.y - _data.boardSize.y / 2
+                    data.boardPosition.x - data.boardSize.x / 2,
+                    data.boardPosition.y - data.boardSize.y / 2
                 );
 
-                return new RectInt(position, _data.boardSize);
+                return new RectInt(position, data.boardSize);
             }
         }
 
@@ -48,11 +50,11 @@ namespace Board
             get
             {
                 var bottomLeft = new Vector2Int(
-                    -_data.boardSize.x / 2,
-                    -_data.boardSize.y / 2
+                    -data.boardSize.x / 2,
+                    -data.boardSize.y / 2
                 );
 
-                return new RectInt(bottomLeft, _data.boardSize);
+                return new RectInt(bottomLeft, data.boardSize);
             }
         }
         
@@ -70,8 +72,8 @@ namespace Board
             var boardGo =
                 TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
             var board = boardGo.AddComponent<Board>();
-            board._data = boardData;
-            board.boardCamera = new BoardCamera(board.gameObject, boardData.cameraPosition);
+            board.data = boardData;
+            board.BoardCamera = BoardCamera.CreateNewBoardCamera(board);
 
             board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
 
@@ -82,8 +84,7 @@ namespace Board
         {
             Tilemap = GetComponentInChildren<Tilemap>();
 
-            var gameDataObject = GameObject.Find("GameData");
-            GameData = gameDataObject.GetComponent<GameData>();
+            GameData = Resources.Load<GameData>("GameData");
 
             border = Border.CreateBoardBorder(this);
             background = BoardBackground.CreateBoardBackground(this);
@@ -95,18 +96,26 @@ namespace Board
             }
         }
 
+        private void Start()
+        {
+            foreach (var tileData in data.tiles)
+            {
+                Tilemap.SetTile(tileData.position, GameData.GetTileFromBlock(tileData.block));
+            }
+        }
+
         #endregion
         
         // TODO These two functions should probably be an interface for all Activatable objects
         public void OnActivate()
         {
-            boardCamera.ActivateCamera();
+            BoardCamera.ActivateCamera();
             gameController.OnActivate();
         }
 
         public void OnDeactivate()
         {
-            boardCamera.DeactivateCamera();
+            BoardCamera.DeactivateCamera();
             gameController.OnDeactivate();
             Tilemap.ClearAllTiles();
         }
@@ -180,6 +189,19 @@ namespace Board
             Gizmos.color = Color.yellow;
             // Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
             Gizmos.DrawWireCube(transform.position, new Vector3(WorldBounds.size.x, WorldBounds.size.y, 0));
+        }
+
+        // TODO - I'm not sure I love this. This sets blocks, but Tetrominos are sets of blocks... Overload? Separate GameEditorBoard?
+        public void SetTile(Block block, Vector3Int tilePosition, Tile tile)
+        {
+            data.tiles.Add(new BoardTileData()
+            {
+                block = block,
+                position = tilePosition
+            });
+            
+            
+            Tilemap.SetTile(tilePosition, tile);
         }
     }
 }

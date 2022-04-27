@@ -1,4 +1,5 @@
 using Common;
+using Initialization;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,24 +10,38 @@ namespace BoardEditor
     /// </summary>
     public class PaintController : MonoBehaviour
     {
+        private GameData _gameData;
         private Tilemap Tilemap { get; set; }
 
         private void Start()
         {
+            _gameData = Resources.Load<GameData>("GameData");
             // Register all paintbutton selection events 
             foreach (var paintButton in FindObjectsOfType<PaintButton>())
             {
                 paintButton.PainterSelectEvent += SelectTile;
             }
-            var paintTileMapObject = TileGameObjectFactory.CreateNewTileObject("PaintGrid", Vector3Int.zero, 3);
-            Tilemap = paintTileMapObject.GetComponent<Tilemap>();
+
+            var newBoardController = FindObjectOfType<NewBoardController>();
+            newBoardController.NewBoardEvent += CleanUp;
+
+            var menuController = FindObjectOfType<MenuButtonController>();
+            menuController.SaveBoardMenuClickEvent += ActivePainterCleanUp;
+            menuController.LoadBoardMenuClickEvent += ActivePainterCleanUp;
+            menuController.ActivateBoardEvent += SetTileMap;
         }
+
+        private void SetTileMap(Board.Board board)
+        {
+            Tilemap = board.Tilemap;
+        }
+
 
         // on PaintButton delegate event fire
         private void SelectTile(PaintButton paintButton)
         {
             ActivePainterCleanUp();
-            ActivePaintTile.CreateNewActivePainter(paintButton, Tilemap);
+            ActivePaintTile.CreateNewActivePainter(paintButton, Tilemap, _gameData.GetBlockFromTile(paintButton.tile));
         }
 
         // Seek and destroy all ActivePainter
@@ -39,6 +54,12 @@ namespace BoardEditor
             {
                 Destroy(activePainter.gameObject);
             }
+        }
+        
+        private void CleanUp(Board.Board _)
+        {
+            ActivePainterCleanUp();
+            Tilemap.ClearAllTiles();
         }
     }
 }
