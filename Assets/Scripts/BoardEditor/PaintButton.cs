@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace BoardEditor
 {
     /// <summary>
-    /// Button logic for Tile Painter. Fires events on click
+    /// Functionality for each button in the TilePanel
     /// </summary>
     public class PaintButton : MonoBehaviour
     {

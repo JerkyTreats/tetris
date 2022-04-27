@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 namespace BoardEditor
 {
+    /// <summary>
+    /// Controller for an individual element in the Load Board list of saves
+    /// </summary>
     public class LoadBoardSelectionController : MonoBehaviour, ISelectHandler
     {
         private string _fileName;
@@ -27,6 +30,7 @@ namespace BoardEditor
             _selectable = GetComponent<Selectable>();
         }
 
+        // When this element is selected, fire an event 
         public void OnSelect(BaseEventData eventData)
         {
             SelectEvent?.Invoke(this);

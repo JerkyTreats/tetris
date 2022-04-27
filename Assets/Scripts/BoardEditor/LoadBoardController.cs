@@ -4,6 +4,9 @@ using Button = UnityEngine.UI.Button;
 
 namespace BoardEditor
 {
+    /// <summary>
+    /// Modal menu controller for Loading a saved Board 
+    /// </summary>
     public class LoadBoardController : ModalController
     {
         private BoardLocalFileRepository _boardLocalFileRepo;
@@ -41,6 +44,11 @@ namespace BoardEditor
             Disable(); 
         }
 
+        // Clear any board/objects in the scene
+        // Read BoardData from source
+        // Create a new Board from the BoardData
+        // Trigger loadboard event
+        // Dismiss the modal
         private void LoadBoard()
         {
             UIHelpers.Clear();
@@ -61,6 +69,9 @@ namespace BoardEditor
             PopulateLoadList();
         }
 
+        // Loop through all board saves belonging to user
+        // Create a prefab selection UI element for each path
+        // Register a selection event for when the user selects the UI element
         private void PopulateLoadList()
         {
             foreach (var path in BoardLocalFileRepo.GetSavedFiles())
@@ -73,7 +84,7 @@ namespace BoardEditor
                 selection.SelectEvent += LoadBoardSelected;
             }
         }
-
+        
         private void LoadBoardSelected(LoadBoardSelectionController loadBoardSelectionController)
         {
             SelectedFile = loadBoardSelectionController.FileName;
@@ -82,10 +93,11 @@ namespace BoardEditor
         private new void Disable()
         {
             base.Disable();
-            DestroyAllChildren();
+            DestroyAllSelectorChildren();
         }
 
-        private void DestroyAllChildren()
+        // Destroy all the selector UI elements 
+        private void DestroyAllSelectorChildren()
         {
             var list = GetComponentsInChildren<LoadBoardSelectionController>();
 

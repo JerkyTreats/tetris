@@ -4,6 +4,9 @@ using UnityEngine.Tilemaps;
 
 namespace BoardEditor
 {
+    /// <summary>
+    /// Tile selected to paint on a board
+    /// </summary>
     public class ActivePaintTile :MonoBehaviour
     {
         private Tile Tile { get; set; }
@@ -32,6 +35,7 @@ namespace BoardEditor
             board = FindObjectOfType<Board.Board>();
         }
 
+        // TODO ActivePaintTile Input System overhaul
         private void Update()
         {
             // Left click
@@ -43,6 +47,11 @@ namespace BoardEditor
                 Destroy(gameObject);
         }
 
+        // Convert user input on screen to coordinates on Board Grid
+        // Place a Tile at the location pressed
+        // TODO ActivePaintTile paints tile on Mouse position alone
+        // Should support mobile click 
+        // See issues for Input System overhaul
         private void PaintTile()
         {
             if (Camera.main == null) return;

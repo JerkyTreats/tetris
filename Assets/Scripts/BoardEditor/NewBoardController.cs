@@ -47,11 +47,16 @@ namespace BoardEditor
             Disable(); 
         }
         
+        // Clear any existing board
+        // Grab boardsize from input
+        // Spawn a new Board
+        // Trigger NewBoard Event
+        // Dismiss this menu
         private void CreateBoard()
         {
-            UIHelpers.Clear(); // Remove any existing board
+            UIHelpers.Clear();
             
-            var boardSize = GetBoardSize(); // Boardsize by input
+            var boardSize = GetBoardSize();
             _defaultBoard.boardSize = boardSize;
             
             var canvasRectTransform = GetComponentInParent<Canvas>().GetComponent<RectTransform>();

@@ -18,8 +18,6 @@ namespace BoardEditor
         [SerializeField] private Button saveBoardButton;
         [SerializeField] private Button loadBoardButton;
 
-        public Board.Board ActiveBoard { get; set; }
-        
         // Fire events when menu item clicked
         public delegate void MenuButtonControllerDelegate();
         public event MenuButtonControllerDelegate NewBoardMenuClickEvent, LoadBoardMenuClickEvent, SaveBoardMenuClickEvent;
@@ -62,11 +60,15 @@ namespace BoardEditor
             LoadBoardMenuClickEvent?.Invoke();
         }
 
+        // New/Load modals will serve up a new board
+        // Capture that event and push a new event
+        // Acts as a central source for any resource dependent on a board 
+        // TODO MenuButtonController: ActivateBoard - Consider separate class 
+        // Have MenuButtonController be just another subscriber to the event
+        // It will reduce scope of the menu controller to only be concerned with the menu
         private void ActivateBoard(Board.Board board)
         {
-            ActiveBoard = board;
             ActivateBoardEvent?.Invoke(board);
-            
             saveBoardButton.interactable = true;
         }
 

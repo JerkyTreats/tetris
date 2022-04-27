@@ -12,7 +12,7 @@ namespace BoardEditor
         // TODO: NewBoardContextController: UI Padding to top-level UI ScriptableObject Asset
         // This field represents the padding for the UI whilst in Portrait mode. 
         // Not only is it magic numbers, it also will likely need to be extended to support landscape.
-        [SerializeField] private readonly Vector2 _uiPadding = new Vector2(100, 500f);
+        private readonly Vector2 _uiPadding = new Vector2(100, 500f);
 
         private readonly Rect _canvasRect;
         private Board.Board _board;

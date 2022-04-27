@@ -7,13 +7,11 @@ namespace BoardEditor
     /// <summary>
     /// Controller for the BoardEditor UI element "TilePanel"
     /// </summary>
-    public class TilePanelController : MonoBehaviour
+    public class TilePanelController : ModalController
     {
-        private CanvasGroup _canvasGroup;
-        
         private void Awake()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>();
 
             // Register the menu button event then disable 
             var newBoardContextController = FindObjectOfType<NewBoardController>();
@@ -24,16 +22,10 @@ namespace BoardEditor
             Disable(); 
         }
 
+        // Enable the tilepanel when a Board is active on screen
         private void Enable(Board.Board _)
         {
-            _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true;
-        }
-
-        private void Disable()
-        {
-            _canvasGroup.alpha = 0f;
-            _canvasGroup.blocksRaycasts = false;
+            base.Enable();
         }
     }
 }

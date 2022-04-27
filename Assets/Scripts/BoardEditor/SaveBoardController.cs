@@ -7,11 +7,15 @@ using UnityEngine.UI;
 
 namespace BoardEditor
 {
+    /// <summary>
+    ///  Modal menu controller for saving an active Board
+    /// </summary>
     public class SaveBoardController : ModalController
     {        
         private BoardLocalFileRepository _boardLocalFileRepo;
         private Board.Board _activeBoard;
 
+        // TODO : BoardEditor LocalFileRepo - Consider just making it a singleton
         private BoardLocalFileRepository BoardLocalFileRepo
         {
             get
@@ -30,12 +34,12 @@ namespace BoardEditor
 
         private void Awake()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>(); // See base class
+            
             saveBoardButton.onClick.AddListener(SaveBoard);
             cancelButton.onClick.AddListener(Disable);
             saveBoardInputBox.onValueChanged.AddListener(UpdateBoardName);
 
-            // Register the menu button event then disable 
             var menuButtonController = FindObjectOfType<MenuButtonController>();
             menuButtonController.SaveBoardMenuClickEvent += Enable;
             menuButtonController.ActivateBoardEvent += ActivateBoard;
@@ -46,8 +50,11 @@ namespace BoardEditor
             Disable(); 
         }
         
+        // Save the ActiveBoard to disk 
+        // Dismiss this menu
         private void SaveBoard()
         {
+            // Not sure I love this guarding, but ended up needing it whiling dev-ing this feature 
             if (!_activeBoard) { Debug.LogError("Missing ActiveBoard on BoardEditor Save"); return; }
             
             BoardLocalFileRepo.Create(_activeBoard.data);
@@ -55,6 +62,7 @@ namespace BoardEditor
             Disable();
         }
         
+        // Don't let the user save the board if there isn't a Board loaded
         private void ActivateBoard(Board.Board board)
         {
             _activeBoard = board;
@@ -66,6 +74,7 @@ namespace BoardEditor
             ActivateCurrentSaveNamePanel(board.data.userSavedBoardName);
         }
 
+        // User defined Board name. Update UI elements to provide visual feedback for the changing name
         private void UpdateBoardName(string newBoardName)
         {
             newBoardName = ValidateAndFixBoardName(newBoardName);
@@ -75,6 +84,8 @@ namespace BoardEditor
             ActivateCurrentSaveNamePanel(newBoardName);
         }
 
+        // The panel that describes the current save name should only appear if there is a name
+        // The panel should update the current save name as the name is updated
         private void ActivateCurrentSaveNamePanel(string saveName)
         {
             currentSaveNamePanel.SetActive(true);
