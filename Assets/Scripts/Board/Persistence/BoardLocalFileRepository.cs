@@ -41,7 +41,7 @@ namespace Board.Persistence
         public List<string> GetSavedFiles()
         {
             // var paths = Directory.GetFiles(_dataContext.SaveDir);
-            var paths = new DirectoryInfo(_dataContext.SaveDir).GetFiles()
+            var paths = new DirectoryInfo(_dataContext.saveDir).GetFiles()
                 .OrderByDescending(f => f.LastWriteTime)
                 .ToList();
             var list = new List<string>();
