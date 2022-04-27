@@ -4,10 +4,8 @@ using Button = UnityEngine.UI.Button;
 
 namespace BoardEditor
 {
-    [RequireComponent(typeof(CanvasGroup)) ]
-    public class LoadBoardController : MonoBehaviour
+    public class LoadBoardController : ModalController
     {
-        private CanvasGroup _canvasGroup;
         private BoardLocalFileRepository _boardLocalFileRepo;
 
         private BoardLocalFileRepository BoardLocalFileRepo
@@ -25,7 +23,6 @@ namespace BoardEditor
         [SerializeField] private Button loadBoardButton;
         [SerializeField] private Button cancelButton;
         
-        // public event Action<NewBoardContextController> LoadBoardEvent;
         public delegate void LoadBoardControllerDelegate(Board.Board board);
         public event LoadBoardControllerDelegate LoadBoardEvent;
 
@@ -33,7 +30,7 @@ namespace BoardEditor
 
         private void Awake()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>();
             loadBoardButton.onClick.AddListener(LoadBoard);
             cancelButton.onClick.AddListener(Disable);
 
@@ -58,11 +55,9 @@ namespace BoardEditor
             Disable();
         }
 
-        public void Enable()
+        private new void Enable()
         {
-            _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true;
-
+            base.Enable();
             PopulateLoadList();
         }
 
@@ -84,12 +79,9 @@ namespace BoardEditor
             SelectedFile = loadBoardSelectionController.FileName;
         }
 
-
-        private void Disable()
+        private new void Disable()
         {
-            _canvasGroup.alpha = 0f;
-            _canvasGroup.blocksRaycasts = false;
-            
+            base.Disable();
             DestroyAllChildren();
         }
 

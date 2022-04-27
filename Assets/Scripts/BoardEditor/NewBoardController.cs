@@ -10,10 +10,9 @@ namespace BoardEditor
     /// <summary>
     /// Controller for the NewBoardContext menu, controlling settings for creating a new Board
     /// </summary>
-    public class NewBoardController : MonoBehaviour
+    public class NewBoardController : ModalController
     {
         private BoardEditorBoardFactory _boardEditorBoardFactory;
-        private CanvasGroup _canvasGroup;
 
         [SerializeField] private Button createNewBoardButton;
         [SerializeField] private Button cancelNewBoardButton;
@@ -38,7 +37,7 @@ namespace BoardEditor
         
         private void Awake()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>();
             createNewBoardButton.onClick.AddListener(CreateBoard);
             cancelNewBoardButton.onClick.AddListener(Disable);
 
@@ -47,21 +46,7 @@ namespace BoardEditor
             menuButtonController.NewBoardMenuClickEvent += Enable;
             Disable(); 
         }
-
-        // Makes the UI element appear and functional
-        private void Enable()
-        {
-            _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true;
-        }
         
-        // Make board invisible + nonfunctional
-        private void Disable()
-        {
-            _canvasGroup.alpha = 0f;
-            _canvasGroup.blocksRaycasts = false;
-        }
-
         private void CreateBoard()
         {
             UIHelpers.Clear(); // Remove any existing board

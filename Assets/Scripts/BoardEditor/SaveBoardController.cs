@@ -7,10 +7,8 @@ using UnityEngine.UI;
 
 namespace BoardEditor
 {
-    [RequireComponent(typeof(CanvasGroup)) ]
-    public class SaveBoardController : MonoBehaviour
+    public class SaveBoardController : ModalController
     {        
-        private CanvasGroup _canvasGroup;
         private BoardLocalFileRepository _boardLocalFileRepo;
         private Board.Board _activeBoard;
 
@@ -32,7 +30,7 @@ namespace BoardEditor
 
         private void Awake()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>();
             saveBoardButton.onClick.AddListener(SaveBoard);
             cancelButton.onClick.AddListener(Disable);
             saveBoardInputBox.onValueChanged.AddListener(UpdateBoardName);
@@ -76,10 +74,17 @@ namespace BoardEditor
 
             ActivateCurrentSaveNamePanel(newBoardName);
         }
+
+        private void ActivateCurrentSaveNamePanel(string saveName)
+        {
+            currentSaveNamePanel.SetActive(true);
+            currentSaveNameField.text = saveName;
+        }
         
         // TODO : SaveBoardController : InputField should be validating Save filenames
         // This is just a hack because I dont want to learn about TMP_InputField validators.
         // They exist and are documented, but I am lazy on this one.
+        // I dont think this even works
         private string ValidateAndFixBoardName(string newBoardName)
         {
             var badChars = Path.GetInvalidFileNameChars();
@@ -92,27 +97,6 @@ namespace BoardEditor
                 newBoardName = "default"; 
 
             return newBoardName;
-
-        }
-
-        private void ActivateCurrentSaveNamePanel(string saveName)
-        {
-            currentSaveNamePanel.SetActive(true);
-            currentSaveNameField.text = saveName;
-        }
-
-        private void Enable()
-        {
-            _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true;
-        }
-
-        private void Disable()
-        {
-            _canvasGroup.alpha = 0f;
-            _canvasGroup.blocksRaycasts = false;
-            saveBoardButton.interactable = false;
-            currentSaveNamePanel.SetActive(false);
         }
     }
 }
