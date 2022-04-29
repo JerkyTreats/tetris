@@ -35,10 +35,13 @@ There are a bunch of different goals I'm working on for this prototype. Maximum 
 
 ## Design Goals
 
+**[DONE]**
 - Load boards with blocks already placed.
   - Requires De/Serialization
   - I'm going hard mode with `protobuf` serialization
     - Might into gRPC eventually
+
+_Detailed Design requirements in Blog/multiboard_tetris_design.md_
 - Stitch multiple boards together.
   - With dynamic camera, borders, and grid assets, this should be relatively easy to implement
 - After clearing arbitrary amount from current board, move to the next board.
@@ -61,7 +64,7 @@ Combining the two ideas makes it about finding entertaining ways to explode the 
 
 ### Large
 
-* _Board Editor (in progress)_
+* Board Editor **[DONE]**
 * Board Serialization (eventually into gRPC?)
 * Stitching boards together
 * Start thinking about MetaGame
