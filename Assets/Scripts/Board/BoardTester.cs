@@ -14,7 +14,6 @@ namespace Board
         public int currentBoard = 1;
 
         public BoardData board1 = new BoardData(
-            new Vector3Int(-1, 7, 0),
             new Vector3Int(0, 0, -10),
             new Vector3Int(0, 0, 0),
             new Vector2Int(10, 20),
@@ -83,7 +82,6 @@ namespace Board
             );
 
             return new BoardData(
-                nextSpawn,
                 nextCam,
                 nextBoardPos,
                 nextBoardSize,
@@ -95,7 +93,7 @@ namespace Board
             Populate();
             // Board b = Board.Initialize(board1.spawnPosition, board1.cameraPosition, board1.boardPosition, board1.boardSize, board1.sortOrder);
             // b.ActivateGameOnBoard();
-            boardObjects[currentBoard].OnActivate();
+            boardObjects[currentBoard].Activate();
             InvokeRepeating("SwitchBoard", 2.0f, 212.0f);
         }
 
@@ -103,9 +101,9 @@ namespace Board
         /// Cycle through each board and see what happens
         /// </summary>
         void SwitchBoard(){
-            boardObjects[currentBoard].OnDeactivate();
+            boardObjects[currentBoard].Deactivate();
             currentBoard = Helpers.Wrap(currentBoard + 1, 0, boardObjects.Count);
-            boardObjects[currentBoard].OnActivate();
+            boardObjects[currentBoard].Activate();
 
         }
     }

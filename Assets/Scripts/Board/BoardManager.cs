@@ -12,7 +12,8 @@ namespace Board
             var boards = FindObjectsOfType<Board>();
             foreach (var board in boards)
             {
-                Destroy(board.gameObject);
+                board.Deactivate();
+                board.Terminate();
             }
         }
     }
