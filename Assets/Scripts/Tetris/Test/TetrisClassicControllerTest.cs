@@ -20,12 +20,12 @@ namespace Tetris.Test
             BoardData board1 = new BoardData(
                 new Vector3Int(0, 0, -10),
                 new Vector3Int(0, 0, 0),
-                new Vector2Int(10, 20),
+                new Vector2Int(10, 10),
                 2
             );
 
             TetrisClassicData data = new TetrisClassicData(
-                new Vector3Int(-1, 7, 0),
+                new Vector3Int(-1, 3, 0),
                 1f,
                 0.5f,
                 board1

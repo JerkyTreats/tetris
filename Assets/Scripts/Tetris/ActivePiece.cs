@@ -119,7 +119,8 @@ namespace Tetris
             foreach (var tilePosition in Cells)
             {
                 var newTilePosition = tilePosition + newPosition;
-                if (!Board.IsValidPosition(newTilePosition)) return false;
+                if (!Board.IsValidPosition(newTilePosition))
+                    return false;
             }
 
             return true;

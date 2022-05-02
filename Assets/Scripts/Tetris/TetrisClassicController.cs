@@ -65,6 +65,9 @@ namespace Tetris
                 ActivePiece = ActivePiece.CreateNewActivePiece(_spawnPosition, _gameData.tetrominos[i], transform, _board, _data.StepDelay, _data.LockDelay );
                 ActivePiece.LockEvent += Lock;
             }
+            
+            if (!ActivePiece.IsValidPiecePosition(_spawnPosition))
+                GameEnd();
         }
 
         /// <summary>
@@ -111,45 +114,30 @@ namespace Tetris
             ActivePiece.Set(_board.Tilemap, ActivePiece.Data.tile);
         }
         
-        private void Lock() {
-            CheckGameEnd();
-
+        private void Lock()
+        {
+            ActivePiece.Set(_board.Tilemap, ActivePiece.Data.tile);
             ActivePiece.Terminate();
             GhostPiece.Terminate();
             
             CheckClearedLines();
             SpawnPiece();
         }
-        
-        private void CheckGameEnd()
-        {
-            // False if there is a piece colliding in spawn position.
-            if (ActivePiece.IsValidPiecePosition(_spawnPosition))
-            {
-                ActivePiece.Set(_board.Tilemap, ActivePiece.Data.tile);
-            }
-            else
-            {
-                GameEnd();
-            }
-        }
 
         private new void GameEnd()
         {
-            // _board.Tilemap.ClearAllTiles();
-            // _board.Deactivate();
-            //
-            // GhostPiece.Terminate();
-            // ActivePiece.Terminate();
-            //
-            // _isGameActive = false;
+            _board.Tilemap.ClearAllTiles();
+            _board.Deactivate();
+            
+            GhostPiece.Terminate();
+            ActivePiece.Terminate();
+            
+            _isGameActive = false;
             
             base.GameEnd();
         }
     
-        /// <summary>
-        /// Clear a fully completed line
-        /// </summary>
+        // Clear a fully completed line
         private void CheckClearedLines() {
             var bounds = _board.TileBounds;
             var row = bounds.yMin;
@@ -162,11 +150,7 @@ namespace Tetris
             }
         }
 
-        /// <summary>
-        /// Determine if line is full
-        /// </summary>
-        /// <param name="row">Row index to check</param>
-        /// <returns>bool</returns>
+        // Determine if line is full
         private bool IsLineFull(int row) {
             var bounds = _board.TileBounds;
 
@@ -182,10 +166,7 @@ namespace Tetris
             return true;
         }
 
-        /// <summary>
-        /// Remove the tiles in a row and step remaining lines down
-        /// </summary>
-        /// <param name="row">Row index to clear</param>
+        // Remove the tiles in a row and step remaining lines down
         private void LineClear(int row) {
             var bounds = _board.TileBounds;
 
