@@ -35,7 +35,7 @@ namespace Tetris.Test
 
             var controller = TetrisClassicController.CreateNewGameController(data);
             
-            controller.GameStart();
+            controller.GameStart(controller);
         }
     }
 }

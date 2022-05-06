@@ -4,6 +4,11 @@ namespace GameManagement
 {
     public struct GameManagerData
     {
-        public List<GameControllerData> GameControllers { get; set; }
+        public IGameControllerData[] GameControllerData { get; set; }
+
+        public GameManagerData(IGameControllerData[] controllersData)
+        {
+            GameControllerData = controllersData;
+        }
     }
 }

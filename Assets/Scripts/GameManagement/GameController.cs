@@ -5,52 +5,40 @@ namespace GameManagement
 {
     public class GameController : MonoBehaviour, IGameController
     {
+        public IGameControllerData Data { get; set; }
         public bool IsInitialized { get; private set; }
         
-        public delegate void GameControllerDelegate(GameController controller);
-        public event GameControllerDelegate GameStarted, GameEnded, GameUpdate;
+        public event IGameController.GameControllerDelegate GameStarted, GameEnded, GameUpdated;
 
-        public static GameController CreateNewGameController(GameControllerData data, GameManager manager)
-        {
-            // Create the game controller object
-            var gameControllerObj = new GameObject(data.ControllerName)
-            {
-                transform =
-                {
-                    parent = manager.transform
-                }
-            };
-                
-            // Initialize the controller
-            var gameController = gameControllerObj.AddComponent<GameController>();
-            gameController.Initialize(data, manager);
-
-            return gameController;
-        }
-        
-        public void Initialize(GameControllerData gameControllerData, GameManager manager)
+        public void Initialize(GameManager manager)
         {
             // Register manager events 
             manager.GameStart += GameStart;
             manager.GameEnd += GameEnd;
-            manager.Terminate += Terminate;
-            manager.Interrupt += Interrupt;
+            // manager.Terminate += Terminate;
+            // manager.Interrupt += Interrupt;
 
             IsInitialized = true;
         }
 
-        public void GameStart()
+        public void GameStart(IGameController controller)
         {
+            Debug.Log("BASE START");
             GameStarted?.Invoke(this);
         }
 
-        public void GameEnd()
+        public void GameEnd(IGameController controller)
         {
             GameEnded?.Invoke(this);
         }
 
-        public void Terminate() { }
+        public void GameUpdate(IGameController controller)
+        {
+            GameUpdated?.Invoke(this);
+        }
 
-        public void Interrupt() { }
+        public void Terminate(IGameController controller) { }
+
+        public void Interrupt(IGameController controller) { }
     }
 }

@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System;
+using System.Collections;
 using UnityEngine;
 
 namespace GameManagement
@@ -7,49 +8,83 @@ namespace GameManagement
     {
         public GameManagerData Data { get; private set; }
 
-        private GameController[] _gameControllers;
+        private IGameController[] _gameControllers;
         
         private int _numGameControllers;
 
-        public delegate void GameManagerDelegate();
-        public event GameManagerDelegate GameStart, GameEnd, Interrupt, Terminate;
+        private int _activeGame;
+
+        public delegate void GameManagerDelegate(IGameController controller);
+
+        public event GameManagerDelegate GameStart, GameEnd;//, Interrupt, Terminate;
         
         public void Initialize(GameManagerData managerData)
         {
             Data = managerData;
-            _numGameControllers = Data.GameControllers.Count;
-            _gameControllers = new GameController[_numGameControllers];
+            _numGameControllers = ((ICollection) Data.GameControllerData).Count;
+            _gameControllers = new IGameController[_numGameControllers];
 
             // Create all GameControllers
             for (var i = 0; i< _numGameControllers; i++)
             {
-                var gameController = GameController.CreateNewGameController(Data.GameControllers[i], this);
+                var gameController = GameControllerInitializer.InitializeGameController(this,
+                    managerData.GameControllerData[i]);
+
                 _gameControllers[i] = gameController;
 
                 // Instrument listeners
                 gameController.GameStarted += ControllerGameStarted;
                 gameController.GameEnded += ControllerGameEnded;
-                gameController.GameUpdate += ControllerGameUpdated;
+                gameController.GameUpdated += ControllerGameUpdated;
                 
                 if (!gameController.IsInitialized)
-                    Debug.LogError("Game controller not initialized: [" + gameController.name + "]");
+                    Debug.LogError("Game controller not initialized: [" + gameController.Data.GameObjectName + "]");
 
             }
+
+            _activeGame = 0;
         }
 
-        private void ControllerGameUpdated(GameController controller)
+        private void StartNextGame()
         {
-            throw new System.NotImplementedException();
+            _activeGame += 1;
+            
+            Debug.Log($"ActiveGame [{_activeGame}]");
+            
+            if (_activeGame == _gameControllers.Length) return;
+            
+            StartGame();
+        }
+        
+        public void StartGame()
+        {
+            Debug.Log($"Triggering StartGame event for [{_gameControllers[_activeGame].Data.Guid}] ");
+
+            GameStart?.Invoke(_gameControllers[_activeGame]);
         }
 
-        private void ControllerGameEnded(GameController controller)
+        public void EndGame()
         {
-            throw new System.NotImplementedException();
+            GameEnd?.Invoke(_gameControllers[_activeGame]);
         }
 
-        private void ControllerGameStarted(GameController controller)
+        private void ControllerGameUpdated(IGameController controller)
         {
-            throw new System.NotImplementedException();
+            Debug.Log("ControllerGameUpdated");
+
+        }
+
+        private void ControllerGameEnded(IGameController controller)
+        {
+            Debug.Log($"Controller [{controller.Data.Guid}] Endgame Event");
+            
+            StartNextGame();
+        }
+
+        private void ControllerGameStarted(IGameController controller)
+        {
+            Debug.Log($"Controller [{controller.Data.Guid}] StartGame Event");
+
         }
     }
 }

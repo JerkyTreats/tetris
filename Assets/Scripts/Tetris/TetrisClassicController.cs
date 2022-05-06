@@ -9,14 +9,25 @@ using UnityEngine;
 // This controls how the game operates- beginning, while active, and end.
 namespace Tetris
 {
-    public class TetrisClassicController : GameController
+    public class TetrisClassicController : GameController, IGameController
     {
-        private TetrisClassicData _data; 
+        public new TetrisClassicData Data
+        {
+            get => _data;
+            set
+            {
+                _data = value;
+                base.Data = value;
+            }
+        }
+        
+        
+
         private Board.Board _board;
         private GameData _gameData;
-        private Vector3Int _spawnPosition;
 
         private bool _isGameActive;
+        [SerializeField] private TetrisClassicData _data;
 
         private List<Tetromino> SpawnBag { get; set; }
 
@@ -27,47 +38,54 @@ namespace Tetris
         {
             var controllerObj = new GameObject("GameController"); 
             var controller = controllerObj.AddComponent<TetrisClassicController>();
-            controller._data = data;
-            controller._spawnPosition = data.SpawnPosition;
-            
-            var board = Board.Board.CreateNewBoard(data.BoardData, controllerObj.transform);
-            controller._board = board;
-            
+            controller.Data = data;
+
             return controller;
         }
 
+        public new void Initialize(GameManager manager)
+        {
+            _board = Board.Board.CreateNewBoard(Data.BoardData, transform);
+            
+            base.Initialize(manager);
+        }
 
         private void Awake()
         {
             _gameData = Resources.Load<GameData>("GameData");
         }
         
-        public new void GameStart()
+        public new void GameStart(IGameController controller)
         {
+            if (controller.Data.Guid != Data.Guid ) return;
+            Debug.Log(controller.Data.Guid + " " + Data.Guid);
+            
+            Debug.Log("OVERLOAD START");
             _board.Activate();
             SpawnPiece();
             
             _isGameActive = true;
-            base.GameStart();
+            base.GameStart(controller);
         }
 
         /// <summary>
         /// Spawn a new Tetromino. Trigger Game Over state if applicable.
         /// </summary>
         private void SpawnPiece() {
+            Debug.Log($"Spawning Piece for [{Data.Guid}]");
             var nextPiece = GetNextPiece();
 
             for (var i = 0; i < _board.GameData.tetrominos.Length; i++)
             {
                 if (_board.GameData.tetrominos[i].tetromino != nextPiece) continue;
             
-                GhostPiece = GhostPiece.CreateNewGhostPiece(_spawnPosition, _gameData.tetrominos[i], transform, _board);
-                ActivePiece = ActivePiece.CreateNewActivePiece(_spawnPosition, _gameData.tetrominos[i], transform, _board, _data.StepDelay, _data.LockDelay );
+                GhostPiece = GhostPiece.CreateNewGhostPiece(Data.SpawnPosition, _gameData.tetrominos[i], transform, _board);
+                ActivePiece = ActivePiece.CreateNewActivePiece(Data.SpawnPosition, _gameData.tetrominos[i], transform, _board, Data.StepDelay, Data.LockDelay );
                 ActivePiece.LockEvent += Lock;
             }
             
-            if (!ActivePiece.IsValidPiecePosition(_spawnPosition))
-                GameEnd();
+            if (!ActivePiece.IsValidPiecePosition(Data.SpawnPosition))
+                GameEnd(this);
         }
 
         /// <summary>
@@ -124,8 +142,12 @@ namespace Tetris
             SpawnPiece();
         }
 
-        private new void GameEnd()
+        private new void GameEnd(IGameController controller)
         {
+            if (controller.Data.Guid != Data.Guid) return;
+            
+            Debug.Log($"Ending game for [{Data.Guid}]");
+            
             _board.Tilemap.ClearAllTiles();
             _board.Deactivate();
             
@@ -134,7 +156,7 @@ namespace Tetris
             
             _isGameActive = false;
             
-            base.GameEnd();
+            base.GameEnd(controller);
         }
     
         // Clear a fully completed line

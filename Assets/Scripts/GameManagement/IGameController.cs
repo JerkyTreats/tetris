@@ -2,10 +2,20 @@ namespace GameManagement
 {
     public interface IGameController
     {
-        void Initialize(GameControllerData gcData, GameManager manager);
-        void GameStart();
-        void GameEnd();
-        void Terminate();
-        void Interrupt();
+        public bool IsInitialized { get; }
+        
+        public IGameControllerData Data { get; set; }
+        
+        public delegate void GameControllerDelegate(IGameController controller);
+        public event GameControllerDelegate GameStarted, GameEnded, GameUpdated;
+        
+        public void Initialize(GameManager manager);
+        public void GameStart(IGameController controller);
+        
+        public void GameEnd(IGameController controller);
+        public void GameUpdate(IGameController controller);
+        
+        public void Terminate(IGameController controller);
+        public void Interrupt(IGameController controller);
     }
 }
