@@ -9,45 +9,45 @@ using UnityEngine;
 // This controls how the game operates- beginning, while active, and end.
 namespace Tetris
 {
-    public class TetrisClassicController : GameController, IGameController
+    public class TetrisClassicController : MonoBehaviour, IGameController
     {
-        public new TetrisClassicData Data
+        private TetrisClassicData _data;
+        public IGameControllerData Data
         {
             get => _data;
-            set
-            {
-                _data = value;
-                base.Data = value;
-            }
+            set => _data = (TetrisClassicData)value;
         }
         
-        
+        public bool IsInitialized { get; private set; }
+
 
         private Board.Board _board;
         private GameData _gameData;
 
         private bool _isGameActive;
-        [SerializeField] private TetrisClassicData _data;
 
         private List<Tetromino> SpawnBag { get; set; }
 
         private ActivePiece ActivePiece { get; set; }
         private GhostPiece GhostPiece { get; set; }
+        
+        public event IGameController.GameControllerDelegate GameStarted, GameEnded, GameUpdated;
 
-        public static TetrisClassicController CreateNewGameController(TetrisClassicData data)
+        public void Initialize(GameManager manager)
         {
-            var controllerObj = new GameObject("GameController"); 
-            var controller = controllerObj.AddComponent<TetrisClassicController>();
-            controller.Data = data;
-
-            return controller;
+            // Register manager events 
+            manager.GameStart += GameStart;
+            manager.GameEnd += GameEnd;
+            // manager.Terminate += Terminate;
+            // manager.Interrupt += Interrupt;
+    
+            Initialize();
         }
 
-        public new void Initialize(GameManager manager)
+        public void Initialize()
         {
-            _board = Board.Board.CreateNewBoard(Data.BoardData, transform);
-            
-            base.Initialize(manager);
+            _board = Board.Board.CreateNewBoard(_data.BoardData, transform);
+            IsInitialized = true;
         }
 
         private void Awake()
@@ -55,22 +55,45 @@ namespace Tetris
             _gameData = Resources.Load<GameData>("GameData");
         }
         
-        public new void GameStart(IGameController controller)
+        public void GameStart(IGameController controller)
         {
             if (controller.Data.Guid != Data.Guid ) return;
-            Debug.Log(controller.Data.Guid + " " + Data.Guid);
             
-            Debug.Log("OVERLOAD START");
             _board.Activate();
             SpawnPiece();
             
             _isGameActive = true;
-            base.GameStart(controller);
+
+            GameStarted?.Invoke(this);
         }
 
-        /// <summary>
-        /// Spawn a new Tetromino. Trigger Game Over state if applicable.
-        /// </summary>
+        public void GameEnd(IGameController controller)
+        {
+            if (controller.Data.Guid != Data.Guid) return;
+            
+            Debug.Log($"Ending game for [{Data.Guid}]");
+            
+            _board.Tilemap.ClearAllTiles();
+            _board.Deactivate();
+            
+            GhostPiece.Terminate();
+            ActivePiece.Terminate();
+            
+            _isGameActive = false;
+
+            GameEnded?.Invoke(this);
+        }
+        
+        // TODO Implement TetrisClassicController.GameUpdate
+        public void GameUpdate(IGameController controller) { }
+
+        // TODO Implement TetrisClassicController.Terminate
+        public void Terminate(IGameController controller) { }
+
+        // TODO Implement TetrisClassicController.Interrupt
+        public void Interrupt(IGameController controller) { }
+
+        // Spawn a new Tetromino. Trigger Game Over state if applicable.
         private void SpawnPiece() {
             Debug.Log($"Spawning Piece for [{Data.Guid}]");
             var nextPiece = GetNextPiece();
@@ -79,19 +102,16 @@ namespace Tetris
             {
                 if (_board.GameData.tetrominos[i].tetromino != nextPiece) continue;
             
-                GhostPiece = GhostPiece.CreateNewGhostPiece(Data.SpawnPosition, _gameData.tetrominos[i], transform, _board);
-                ActivePiece = ActivePiece.CreateNewActivePiece(Data.SpawnPosition, _gameData.tetrominos[i], transform, _board, Data.StepDelay, Data.LockDelay );
+                GhostPiece = GhostPiece.CreateNewGhostPiece(_data.SpawnPosition, _gameData.tetrominos[i], transform, _board);
+                ActivePiece = ActivePiece.CreateNewActivePiece(_data.SpawnPosition, _gameData.tetrominos[i], transform, _board, _data.StepDelay, _data.LockDelay );
                 ActivePiece.LockEvent += Lock;
             }
             
-            if (!ActivePiece.IsValidPiecePosition(Data.SpawnPosition))
+            if (!ActivePiece.IsValidPiecePosition(_data.SpawnPosition))
                 GameEnd(this);
         }
 
-        /// <summary>
-        /// Randomly cycle through a bag of each type of Tetromino. Refill bag on empty.
-        /// </summary>
-        /// <returns>Tetromino Enum to spawn next</returns>
+        // Randomly cycle through a bag of each type of Tetromino. Refill bag on empty.
         private Tetromino GetNextPiece() {
             if (SpawnBag == null || SpawnBag.Count == 0){
                 SpawnBag = new List<Tetromino> {
@@ -142,23 +162,6 @@ namespace Tetris
             SpawnPiece();
         }
 
-        private new void GameEnd(IGameController controller)
-        {
-            if (controller.Data.Guid != Data.Guid) return;
-            
-            Debug.Log($"Ending game for [{Data.Guid}]");
-            
-            _board.Tilemap.ClearAllTiles();
-            _board.Deactivate();
-            
-            GhostPiece.Terminate();
-            ActivePiece.Terminate();
-            
-            _isGameActive = false;
-            
-            base.GameEnd(controller);
-        }
-    
         // Clear a fully completed line
         private void CheckClearedLines() {
             var bounds = _board.TileBounds;

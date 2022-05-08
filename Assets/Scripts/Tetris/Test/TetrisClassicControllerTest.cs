@@ -6,15 +6,6 @@ namespace Tetris.Test
 {
     public class TetrisClassicControllerTest : MonoBehaviour
     {
-
-        
-    //     [ProtoMember(1)] public Vector3Int SpawnPosition { get; set; }
-    //     [ProtoMember(2)] public int StepDelay { get; set; }
-    //     [ProtoMember(3)] public float LockDelay { get; set; }
-    //     
-    //     [ProtoMember(4)] public BoardData BoardData { get; set; }
-    // }
-        
         private void Start()
         {
             BoardData board1 = new BoardData(
@@ -31,10 +22,11 @@ namespace Tetris.Test
                 board1
             );
 
+            var controllerObj = new GameObject("Controller");
+            var controller = controllerObj.AddComponent<TetrisClassicController>();
 
-
-            var controller = TetrisClassicController.CreateNewGameController(data);
-            
+            controller.Data = data;
+            controller.Initialize();
             controller.GameStart(controller);
         }
     }

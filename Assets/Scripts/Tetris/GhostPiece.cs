@@ -17,7 +17,7 @@ namespace Tetris
 
         public static GhostPiece CreateNewGhostPiece(Vector3Int spawnPosition, TetrominoData data, Transform parent, Board.Board board)
         {
-            var ghostPieceObject = TileGameObjectFactory.CreateNewTileObject("GhostPiece", Vector3Int.zero, 1, parent);
+            var ghostPieceObject = TileGameObjectFactory.CreateNewTileObject("GhostPiece", board.transform.position, 1, parent);
         
             var ghostPiece = ghostPieceObject.AddComponent<GhostPiece>();
             ghostPiece.Data = data;
@@ -41,9 +41,7 @@ namespace Tetris
             _tile = Resources.Load<GameData>("GameData").ghostTile;
         }
 
-        /// <summary>
-        /// Drops the piece to the correct row
-        /// </summary>
+        // Drops the piece to the correct row
         private void Drop(Vector3Int activePiecePosition) {
             var bounds = Board.WorldBounds;
             position = activePiecePosition;

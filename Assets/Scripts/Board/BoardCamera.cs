@@ -14,15 +14,14 @@ namespace Board
             {
                 transform =
                 {
-                    position = board.data.cameraPosition
+                    position = board.data.cameraPosition,
+                    parent = board.transform,
                 }
             };
             boardCameraObject.SetActive(false);
             
 
             var camera = boardCameraObject.AddComponent<Camera>();
-            boardCameraObject.transform.parent = board.transform;
-
             camera.orthographic = true;
             camera.orthographicSize = OrthoCameraSizeFitToBoard(board);
         

@@ -18,9 +18,9 @@ namespace Tetris.Test
             );
             
             BoardData board2 = new BoardData(
-                new Vector3Int(0, 0, -10),
-                new Vector3Int(0, -5, 0),
-                new Vector2Int(15, 20),
+                new Vector3Int(0, -20, -10),
+                new Vector3Int(0, (-20), 0),
+                new Vector2Int(16, 20),
                 2
             );
 
@@ -52,7 +52,7 @@ namespace Tetris.Test
             var manager = managerObj.AddComponent<GameManager>();
             
             manager.Initialize(managerData);
-            manager.StartGame();
+            manager.StartSession();
         }
         
         

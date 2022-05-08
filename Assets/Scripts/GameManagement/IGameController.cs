@@ -1,5 +1,8 @@
 namespace GameManagement
 {
+    /// <summary>
+    /// Contract defining responsibility for a GameController object managed by a GameManager.
+    /// </summary>
     public interface IGameController
     {
         public bool IsInitialized { get; }
