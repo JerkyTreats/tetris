@@ -8,6 +8,8 @@ namespace Tetris.Test
 {
     public class TetrisClassicManagerTest : MonoBehaviour
     {
+        private GameManager _manager; 
+        
         private void Start()
         {
             BoardData board1 = new BoardData(
@@ -49,12 +51,23 @@ namespace Tetris.Test
             );
 
             var managerObj = new GameObject("GameManager");
-            var manager = managerObj.AddComponent<GameManager>();
+            _manager = managerObj.AddComponent<GameManager>();
             
-            manager.Initialize(managerData);
-            manager.StartSession();
+            _manager.Initialize(managerData);
+            _manager.StartSession();
         }
-        
-        
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.P)) 
+            {
+                _manager.InterruptSession();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _manager.EndSession();
+            }
+        }
     }
 }

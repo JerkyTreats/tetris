@@ -19,6 +19,6 @@ namespace GameManagement
         public void GameUpdate(IGameController controller);
         
         public void Terminate(IGameController controller);
-        public void Interrupt(IGameController controller);
+        public void Interrupt(IGameController controller, Interrupt context);
     }
 }

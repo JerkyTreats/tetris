@@ -16,10 +16,13 @@ namespace GameManagement
         private int _activeGame;
 
         private bool _isSessionStarted;
+        private bool _isInterrupted;
 
         public delegate void GameManagerDelegate(IGameController controller);
 
-        public event GameManagerDelegate GameStart, GameEnd;//, Interrupt, Terminate;
+        public delegate void GameManagerInterrupt(IGameController controller, Interrupt interrupt);
+        public event GameManagerDelegate GameStart, GameEnd, Terminate;
+        public event GameManagerInterrupt Interrupt;
         
         /// <summary>
         /// Initialize the GameManager from Data and all child objects
@@ -83,11 +86,42 @@ namespace GameManagement
             _isSessionStarted = true;
             StartNextGame();
         }
-              
+
         /// <summary>
         /// End the Managed Game Session.
         /// </summary>
-        public void EndSession() { } // Invoke EndSession event
+        public void EndSession()
+        {
+            foreach (var controller in _gameControllers)
+            {
+                Terminate?.Invoke(controller);
+            }
+            
+            // TODO: Add GameManager Session Events 
+            // EndSession would fire here. 
+            
+            Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// Interrupt the Managed Game Session.
+        /// </summary>
+        public void InterruptSession()
+        {
+            var context = _isInterrupted ? GameManagement.Interrupt.Start : GameManagement.Interrupt.Stop;
+            
+            _isInterrupted = !_isInterrupted;
+            
+            Interrupt?.Invoke(_gameControllers[_activeGame], context);
+        }
+
+        /// <summary>
+        /// End the Managed Game Session.
+        /// </summary>
+        public void EndGame(IGameController controller)
+        {
+            GameEnd?.Invoke(controller);
+        } 
         
         // Increment the active game and begin the next game in the queue.
         private void StartNextGame()

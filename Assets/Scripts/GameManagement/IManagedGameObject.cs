@@ -5,6 +5,5 @@ namespace GameManagement
         void Activate();
         void Deactivate();
         void Terminate();
-        // void Interrupt();
     }
 }

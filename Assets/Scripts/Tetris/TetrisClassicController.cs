@@ -38,8 +38,8 @@ namespace Tetris
             // Register manager events 
             manager.GameStart += GameStart;
             manager.GameEnd += GameEnd;
-            // manager.Terminate += Terminate;
-            // manager.Interrupt += Interrupt;
+            manager.Terminate += Terminate;
+            manager.Interrupt += Interrupt;
     
             Initialize();
         }
@@ -87,11 +87,28 @@ namespace Tetris
         // TODO Implement TetrisClassicController.GameUpdate
         public void GameUpdate(IGameController controller) { }
 
-        // TODO Implement TetrisClassicController.Terminate
-        public void Terminate(IGameController controller) { }
+        public void Terminate(IGameController controller)
+        {
+            if (controller.Data.Guid != Data.Guid) return;
 
-        // TODO Implement TetrisClassicController.Interrupt
-        public void Interrupt(IGameController controller) { }
+            if (_isGameActive)
+            {
+                GhostPiece.Terminate();
+                ActivePiece.Terminate();
+                _board.Terminate();
+            }
+            
+            Destroy(gameObject);
+        }
+        
+        public void Interrupt(IGameController controller, Interrupt context)
+        {
+            if (controller.Data.Guid != Data.Guid) return;
+
+            Debug.Log($"Controller [{Data.Guid}] received Interrupt [{context}");
+
+            _isGameActive = context == GameManagement.Interrupt.Start;
+        }
 
         // Spawn a new Tetromino. Trigger Game Over state if applicable.
         private void SpawnPiece() {
