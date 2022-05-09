@@ -1,5 +1,6 @@
 using Board.Persistence;
 using Common;
+using GameManagement;
 using Initialization;
 using Tetris;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.Tilemaps;
 
 namespace Board
 {
-    public class Board : MonoBehaviour
+    public class Board : MonoBehaviour, IManagedGameObject
     {
         #region Properties
 
@@ -21,7 +22,6 @@ namespace Board
 
         public GameData GameData { get; private set; }
         public BoardCamera BoardCamera { get; private set; }
-        public GameController gameController;
 
         public Tilemap Tilemap { get; private set; }
 
@@ -67,15 +67,15 @@ namespace Board
         /// </summary>
         /// <param name="boardData"></param>
         /// <returns></returns>
-        public static Board CreateNewBoard(BoardData boardData)
+        public static Board CreateNewBoard(BoardData boardData, Transform parent = null)
         {
             var boardGo =
                 TileGameObjectFactory.CreateNewTileObject("Board", boardData.boardPosition, boardData.sortOrder);
+            boardGo.transform.parent = parent;
+            
             var board = boardGo.AddComponent<Board>();
             board.data = boardData;
             board.BoardCamera = BoardCamera.CreateNewBoardCamera(board);
-
-            board.gameController = GameController.CreateNewGameLogic(board, boardData.spawnPosition);
 
             return board;
         }
@@ -107,62 +107,22 @@ namespace Board
         #endregion
         
         // TODO These two functions should probably be an interface for all Activatable objects
-        public void OnActivate()
+        public void Activate()
         {
             BoardCamera.ActivateCamera();
-            gameController.OnActivate();
         }
 
-        public void OnDeactivate()
+        public void Deactivate()
         {
             BoardCamera.DeactivateCamera();
-            gameController.OnDeactivate();
             Tilemap.ClearAllTiles();
         }
 
-        /// <summary>
-        /// Set piece on board
-        /// </summary>
-        /// <param name="piece"></param>
-        public void Set(ActivePiece piece)
+        public void Terminate()
         {
-            foreach (var t in piece.Cells)
-            {
-                var tilePosition = t + piece.position;
-                Tilemap.SetTile(tilePosition, piece.Data.tile);
-            }
+            Destroy(gameObject);
         }
 
-        /// <summary>
-        /// Remove piece from board
-        /// </summary>
-        /// <param name="piece"></param>
-        public void Clear(ActivePiece piece)
-        {
-            foreach (var t in piece.Cells)
-            {
-                var tilePosition = t + piece.position;
-                Tilemap.SetTile(tilePosition, null);
-            }
-        }
-
-        /// <summary>
-        /// Determine if piece is within bounds
-        /// </summary>
-        /// <param name="piece"></param>
-        /// <param name="newPosition"></param>
-        /// <returns>bool</returns>
-        public bool IsValidPiecePosition(ActivePiece piece, Vector3Int newPosition)
-        {
-            // Loop through each tile in the Tetromino
-            foreach (var tilePosition in piece.Cells)
-            {
-                var newTilePosition = tilePosition + newPosition;
-                if (!IsValidPosition(newTilePosition)) return false;
-            }
-
-            return true;
-        }
 
         /// <summary>
         /// Determines if the input position is within the bounds of the Board size.

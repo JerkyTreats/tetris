@@ -1,4 +1,7 @@
+using System;
 using Common;
+using GameManagement;
+using Initialization;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,99 +10,74 @@ namespace Tetris
     /// <summary>
     /// Tracks the Active Piece and shows the position that piece would be if it were dropped.
     /// </summary>
-    public class GhostPiece : MonoBehaviour
+    public class GhostPiece : ActivePiece
     {
-        public Board.Board board;
-        public Tile tile;
-        private ActivePiece TrackingPiece { get; set; }
-        private Tilemap Tilemap { get; set; }
-        private Vector3Int[] Cells { get; set; }
-        private Vector3Int Position { get; set; }
+        private Tilemap _tilemap;
+        private Tile _tile;
 
-        /// <summary>
-        /// Create the Ghost Piece GameObject and initialize
-        /// </summary>
-        public static GhostPiece CreateNewGhostPiece(Board.Board board, ActivePiece activePiece, Tile tile)
+        public static GhostPiece CreateNewGhostPiece(Vector3Int spawnPosition, TetrominoData data, Transform parent, Board.Board board)
         {
-            var ghostObject = TileGameObjectFactory.CreateNewTileObject("Ghost", Vector3Int.zero, 1, board.transform);
+            var ghostPieceObject = TileGameObjectFactory.CreateNewTileObject("GhostPiece", board.transform.position, 1, parent);
+        
+            var ghostPiece = ghostPieceObject.AddComponent<GhostPiece>();
+            ghostPiece.Data = data;
+            ghostPiece.position = spawnPosition;
+            ghostPiece._tilemap = ghostPiece.GetComponent<Tilemap>();
+            ghostPiece.Board = board;
 
-            var ghostPiece = ghostObject.AddComponent<GhostPiece>();
-            ghostPiece.board = board;
-            ghostPiece.TrackingPiece = activePiece;
-            ghostPiece.transform.localPosition = Vector3.zero;
-            ghostPiece.tile = tile;
+            ghostPiece.Cells ??= new Vector3Int[data.Cells.Length];
+
+            for (var i = 0; i < data.Cells.Length; i++) {
+                ghostPiece.Cells[i] = (Vector3Int)data.Cells[i];
+            }
+
+            ghostPiece.Drop(spawnPosition);
 
             return ghostPiece;
         }
 
-        public void Awake() {
-            Tilemap = GetComponentInChildren<Tilemap>();
-            Cells = new Vector3Int[4];
-        }
-
-        // Do late update to track when the real piece moves
-        private void LateUpdate()
+        private void Awake()
         {
-            Clear();
-            Copy();
-            Drop();
-            Set();
+            _tile = Resources.Load<GameData>("GameData").ghostTile;
         }
 
-        /// <summary>
-        /// Remove the ghost from the board
-        /// </summary>
-        private void Clear()
-        {
-            foreach (var tilePosition in Cells)
-            {
-                var newTilePosition = tilePosition + Position;
-                Tilemap.SetTile(newTilePosition, null);
-            }
-        }
-
-        /// <summary>
-        /// Clone the tracking piece shape as the ghosts shape
-        /// </summary>
-        private void Copy() {
-            for (var i = 0; i < Cells.Length; i++) {
-                Cells[i] = TrackingPiece.Cells[i];
-            }
-        }
-
-        /// <summary>
-        /// Drops the piece to the correct row
-        /// </summary>
-        private void Drop() {
-            var bounds = board.WorldBounds;
-            var row = TrackingPiece.position.y - 1;
-
-            // Wrap logic in Clear/Set as IsValidPosition will be false as Ghost will be in same position as tracking piece
-            board.Clear(TrackingPiece);
-
+        // Drops the piece to the correct row
+        private void Drop(Vector3Int activePiecePosition) {
+            var bounds = Board.WorldBounds;
+            position = activePiecePosition;
+            var row = activePiecePosition.y - 1;
+            
             while ( row >= bounds.yMin - 1 ) {
-                var pos = TrackingPiece.position;
+                var pos = position;
                 pos.y = row;
 
-                if(board.IsValidPiecePosition(TrackingPiece, pos)) {
+                if(IsValidPiecePosition(pos)) {
                     row--;
                 } else {
                     pos.y = row + 1;
-                    Position = pos;
+                    position = pos;
                     break;
                 }
             }
 
-            board.Set(TrackingPiece);
+            Set(_tilemap, _tile);
+        }
+        
+        private void Copy(ActivePiece activePiece) {
+            for (var i = 0; i < Cells.Length; i++) {
+                Cells[i] = activePiece.Cells[i];
+            }
+        }
+        
+        public void Step(ActivePiece activePiece)
+        {
+            Copy(activePiece);
+            Drop(activePiece.position);
         }
 
-        private void Set()
+        public void Clear()
         {
-            foreach (var tilePosition in Cells)
-            {
-                var newTilePosition = tilePosition + Position;
-                Tilemap.SetTile(newTilePosition, tile);
-            }
+            _tilemap.ClearAllTiles();
         }
     }
 }

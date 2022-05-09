@@ -24,7 +24,6 @@ namespace BoardEditor
         // This was duplicated from BoardManager
         // Can be considered a "default Tetris board"
         private BoardData _defaultBoard = new BoardData(
-            new Vector3Int(-1, 7, 0),
             new Vector3Int(0, 0, -10),
             new Vector3Int(0, 0, 0),
             new Vector2Int(10,20),

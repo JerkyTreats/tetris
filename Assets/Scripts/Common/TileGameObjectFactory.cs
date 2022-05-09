@@ -8,7 +8,7 @@ namespace Common
         /// <summary>
         /// Creates a generic Tilemap Game Object with necessary components.  
         /// </summary>
-        public static GameObject CreateNewTileObject(string name, Vector3Int position, int sortOrder = 0, Transform parent = null)
+        public static GameObject CreateNewTileObject(string name, Vector3 position, int sortOrder = 0, Transform parent = null)
         {
             var gameObject = new GameObject(name)
             {

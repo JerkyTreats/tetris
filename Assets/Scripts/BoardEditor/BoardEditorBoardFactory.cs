@@ -36,7 +36,7 @@ namespace BoardEditor
         {
             SetBoardCameraSize();
             SetBoardCameraPosition();
-            _board.BoardCamera.ActivateCamera(); 
+            _board.Activate();
         }
 
         // Determine + Set how big a board should be so there's no overlap with UI
